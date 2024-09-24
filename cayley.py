@@ -625,30 +625,8 @@ class CayleyPermutation:
                 shuff[idx_shuff] = list_b[idx_b]
             yield list(shuff)
 
-    def old_ascii_plot(self) -> str:
-        """Returns an ascii plot of the mesh pattern."""
-        if len(self) == 0:
-            return "+---+\n|   |\n+---+\n"
-        n = len(self.cperm)
-        m = max(self.cperm)
-        rows = []
-        for i in range(m + 1):
-            new_row = []
-            for j in self.cperm:
-                if j == i:
-                    new_row.append(" \u25cf ")
-                else:
-                    new_row.append("   ")
-            rows.append(new_row)
-        rows_as_strings = []
-        for row in rows:
-            rows_as_strings.append("|" + "|".join(row) + "|" + "\n")
-        edge_row = "---".join("+" for _ in range(n + 1)) + "\n"
-        grid = edge_row + edge_row.join(reversed(rows_as_strings)) + edge_row
-        return grid
-
     def ascii_plot(self) -> str:
-        """Returns an ascii plot of the mesh pattern.
+        """Returns an ascii plot of the Cayley permutation.
         Example:
         >>> print(CayleyPermutation([0, 1, 2, 1, 0]).ascii_plot())
            |   |   |   |   |
@@ -674,59 +652,6 @@ class CayleyPermutation:
             for j in self.cperm:
                 if j == i:
                     new_row += point + normal_row
-                else:
-                    new_row += crossing_lines + normal_row
-            new_row += "\n"
-            point_rows.append(new_row)
-        empty_row = normal_column.join(empty_cell for _ in range(n + 1)) + "\n"
-        grid = empty_row + empty_row.join(reversed(point_rows)) + empty_row
-        return grid
-
-    def gridding_ascii_plot(self, gridding) -> str:
-        """Returns an ascii plot of the 2x2 gridding.
-        Example:
-        >>> print(CayleyPermutation([0, 4, 3, 5, 2, 1]).gridding_ascii_plot([[[4, 3], [5]], [[0], [2, 1]]]))
-           |    |    |    |    |    |
-        ---+ ---+ ---+ ---🔴---+ ---+ ---
-           |    |    |    |    |    |
-        ---+ ---🔵---+ ---+ ---+ ---+ ---
-           |    |    |    |    |    |
-        ---+ ---+ ---🔵---+ ---+ ---+ ---
-           |    |    |    |    |    |
-        ---+ ---+ ---+ ---+ ---🟢---+ ---
-           |    |    |    |    |    |
-        ---+ ---+ ---+ ---+ ---+ ---🟢---
-           |    |    |    |    |    |
-        ---🟣---+ ---+ ---+ ---+ ---+ ---
-           |    |    |    |    |    |
-        """
-        top, bottom = gridding
-        top_left, top_right = top
-        bottom_left, bottom_right = bottom
-
-        if len(self) == 0:
-            return "+---+\n|   |\n+---+\n"
-        n = len(self.cperm)
-        m = max(self.cperm)
-        empty_cell = "   "
-        point = "\u25cf"
-        normal_row = "---"
-        crossing_lines = "+ "
-        normal_column = "| "
-        point_rows = []
-        for i in range(m + 1):
-            new_row = normal_row
-            for j in self.cperm:
-                if j == i:
-                    if j in top_left:
-                        new_row += "🔵" + normal_row
-                    elif j in top_right:
-                        new_row += "🔴" + normal_row
-                    elif j in bottom_left:
-                        new_row += "🟣" + normal_row
-                    elif j in bottom_right:
-                        new_row += "🟢" + normal_row
-                    # new_row += point + normal_row
                 else:
                     new_row += crossing_lines + normal_row
             new_row += "\n"
