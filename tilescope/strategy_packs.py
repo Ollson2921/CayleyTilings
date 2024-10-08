@@ -9,6 +9,8 @@ from .strategies import (
     PointPlacementFactory,
     LessThanRowColSeparationStrategy,
     LessThanOrEqualRowColSeparationStrategy,
+    RowInsertionFactory,
+    ColInsertionFactory,
 )
 
 
@@ -45,7 +47,12 @@ class TileScopePack(StrategyPack):
                 LessThanRowColSeparationStrategy(),
             ],  # Iterable[Strategy]
             expansion_strats=[
-                [CellInsertionFactory(), PointPlacementFactory()]
+                [
+                    CellInsertionFactory(),
+                    PointPlacementFactory(),
+                    RowInsertionFactory(),
+                    ColInsertionFactory(),
+                ]
             ],  # Iterable[Iterable[Strategy]]
             ver_strats=[AtomStrategy()],  # Iterable[Strategy]
             name="Point Placement",

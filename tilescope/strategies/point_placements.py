@@ -17,6 +17,9 @@ from gridded_cayley_permutations.point_placements import (
     Right_bot,
     Left,
     Right,
+    Left_bot,
+    Left_top,
+    Right_top,
 )
 from gridded_cayley_permutations import GriddedCayleyPerm
 from cayley_permutations import CayleyPermutation
@@ -154,3 +157,55 @@ class PartialRequirementPlacementStrategy(RequirementPlacementStrategy):
 
     def formal_step(self):
         return f"Partially placed the point of the requirement {self.gcps} at indices {self.indices} in direction {self.direction}"
+
+
+class RowInsertionFactory(StrategyFactory[Tiling]):
+    def __call__(self, comb_class: Tiling) -> Iterator[RequirementPlacementStrategy]:
+        not_point_rows = set(range(comb_class.dimensions[1])) - comb_class.point_rows()
+        for row in not_point_rows:
+            all_gcps = []
+            for col in range(comb_class.dimensions[0]):
+                cell = (col, row)
+                gcps = (GriddedCayleyPerm(CayleyPermutation([0]), [cell]),)
+                all_gcps.append(gcps)
+            indices = tuple(0 for _ in all_gcps)
+            for direction in [Left_bot, Right_bot, Left_top, Right_top]:
+                yield RequirementPlacementStrategy(all_gcps, indices, direction)
+            yield comb_class.add_obstructions(all_gcps)
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "RowInsertionFactory":
+        return cls(**d)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}()"
+
+    def __str__(self) -> str:
+        return "Row insertion"
+
+
+class ColInsertionFactory(StrategyFactory[Tiling]):
+    def __call__(self, comb_class: Tiling) -> Iterator[RequirementPlacementStrategy]:
+        not_point_cols = set(range(comb_class.dimensions[0])) - set(
+            [cell[0] for cell in comb_class.point_cells]
+        )
+        for col in not_point_cols:
+            all_gcps = []
+            for row in range(comb_class.dimensions[1]):
+                cell = (col, row)
+                gcps = (GriddedCayleyPerm(CayleyPermutation([0]), [cell]),)
+                all_gcps.append(gcps)
+            indices = tuple(0 for _ in all_gcps)
+            for direction in [Left, Right]:
+                yield RequirementPlacementStrategy(all_gcps, indices, direction)
+            yield comb_class.add_obstructions(all_gcps)
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "RowInsertionFactory":
+        return cls(**d)
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}()"
+
+    def __str__(self) -> str:
+        return "Row insertion"
