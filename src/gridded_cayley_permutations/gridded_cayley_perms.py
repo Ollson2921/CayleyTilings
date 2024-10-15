@@ -302,7 +302,7 @@ class GriddedCayleyPerm:
             CayleyPermutation.standardise(new_pattern), new_positions
         )
 
-    def contains_index(self, direction: int, indices: Tuple(int, int)) -> bool:
+    def contains_index(self, direction: int, indices) -> bool:
         """Returns True if the gridded Cayley permutation contains a point in the row/cols in indices
         (where if direction = 0 then checks cols, else rows).
         (hence True if for any cell in self.positions, cell[direction] == int for int in indices).

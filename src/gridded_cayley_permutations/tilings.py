@@ -290,7 +290,7 @@ class Tiling(CombinatorialClass):
             # AO: if two row/cols are fuseable then can we just remove one of them and tidy up?
             pass
 
-    def is_fuseable(self, direction: int, indices: Tuple(int, int)) -> bool:
+    def is_fuseable(self, direction: int, indices) -> bool:
         """Checks if the columns/rows are fuseable, if so returns the
         obstructions and requirements else returns None."""
         ob_list = [
@@ -312,7 +312,7 @@ class Tiling(CombinatorialClass):
             req_lists_in_fusion.append(reqs_in_fusion)
         return obs_in_fusion, req_lists_in_fusion
 
-    def check_shifts(self, direction: int, indices: Tuple(int, int), ob_list) -> bool:
+    def check_shifts(self, direction: int, indices, ob_list) -> bool:
         obs_in_fusion = []
         while len(ob_list) > 0:
             ob = ob_list.pop()
