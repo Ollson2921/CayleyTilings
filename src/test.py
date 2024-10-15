@@ -14,7 +14,7 @@ from gridded_cayley_permutations.point_placements import (
     Right_top,
 )
 
-GCP = GriddedCayleyPerm(CayleyPermutation((0,1,1,2,0)) , ((0,0),(1,1),(2,1),(2,2),(2,0)))
+GCP = GriddedCayleyPerm(CayleyPermutation((1,0,1,2,0)) , ((0,1),(1,0),(2,1),(2,2),(3,0)))
 
 print("Column 0 Shifts")
 for g in GCP.shifts(1,0):
