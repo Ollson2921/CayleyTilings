@@ -302,6 +302,16 @@ class GriddedCayleyPerm:
             CayleyPermutation.standardise(new_pattern), new_positions
         )
 
+    def contains_index(self, direction: int, indices: Tuple(int, int)) -> bool:
+        """Returns True if the gridded Cayley permutation contains a point in the row/cols in indices
+        (where if direction = 0 then checks cols, else rows).
+        (hence True if for any cell in self.positions, cell[direction] == int for int in indices).
+        """
+        for cell in self.positions:
+            if cell[direction] in indices:
+                return True
+        return False
+
     def to_jsonable(self) -> dict:
         """Returns a jsonable dictionary of the gridded Cayley permutation."""
         return {"pattern": self.pattern.to_jsonable(), "positions": self.positions}
