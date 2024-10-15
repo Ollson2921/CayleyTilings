@@ -309,18 +309,19 @@ class GriddedCayleyPerm:
         return GriddedCayleyPerm(
             CayleyPermutation.standardise(new_pattern), new_positions
         )
+    
     def shifts(self, index, direction):
         """Returns all ways to shift points in a Cayley permutation between two rows or columns"""
         if direction == 0: #Column Shift
             indeces = sorted(self.indices_in_col(index) + self.indices_in_col(index + 1))
-            step = -1
+            i,step = 1,-1
         if direction == 1: #Row Shift
             indeces = sorted(self.indices_in_row(index) + self.indices_in_row(index + 1))
-            step = 1
+            i,step = 0,1
         left , right = list(self.positions)[:indeces[0]], list(self.positions)[indeces[-1]:]
         right.pop(0)
         for p in indeces+[indeces[-1]+1]:
-            new_positions= left + [(self.positions[q][(direction+1)%2],index + int(q >= p))[::step] for q in indeces] + right
+            new_positions= left + [(self.positions[q][i],index + int(q >= p))[::step] for q in indeces] + right
             try:
                 yield GriddedCayleyPerm(self.pattern,new_positions)
             except:

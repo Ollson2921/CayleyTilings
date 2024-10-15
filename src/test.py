@@ -14,11 +14,12 @@ from gridded_cayley_permutations.point_placements import (
     Right_top,
 )
 
-GCP = GriddedCayleyPerm(CayleyPermutation((0,1,1,2,0)) , ((0,0),(0,1),(1,1),(1,1),(2,0)))
+GCP = GriddedCayleyPerm(CayleyPermutation((0,1,1,2,0)) , ((0,0),(1,1),(2,1),(2,2),(2,0)))
 
 print("Column 0 Shifts")
-for g in GCP.shifts(0,0):
+for g in GCP.shifts(1,0):
     print(g)
 print("Row 0 Shifts")
-for g in GCP.shifts(0,1):
+for g in GCP.shifts(1,1):
     print(g)
+    
