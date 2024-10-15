@@ -48,9 +48,9 @@ class RequirementPlacementStrategy(DisjointUnionStrategy[Tiling, GriddedCayleyPe
         return PointPlacement(tiling)
 
     def decomposition_function(self, comb_class: Tiling) -> Tuple[Tiling, ...]:
-        return self.algorithm(comb_class).point_placement(
-            self.gcps, self.indices, self.direction
-        )
+        return (comb_class.add_obstructions(self.gcps),) + self.algorithm(
+            comb_class
+        ).point_placement(self.gcps, self.indices, self.direction)
 
     def extra_parameters(
         self, comb_class: Tiling, children: Optional[Tuple[Tiling, ...]] = None
@@ -166,12 +166,11 @@ class RowInsertionFactory(StrategyFactory[Tiling]):
             all_gcps = []
             for col in range(comb_class.dimensions[0]):
                 cell = (col, row)
-                gcps = (GriddedCayleyPerm(CayleyPermutation([0]), [cell]),)
+                gcps = GriddedCayleyPerm(CayleyPermutation([0]), [cell])
                 all_gcps.append(gcps)
             indices = tuple(0 for _ in all_gcps)
             for direction in [Left_bot, Right_bot, Left_top, Right_top]:
                 yield RequirementPlacementStrategy(all_gcps, indices, direction)
-            yield comb_class.add_obstructions(all_gcps)
 
     @classmethod
     def from_dict(cls, d: dict) -> "RowInsertionFactory":
@@ -198,7 +197,6 @@ class ColInsertionFactory(StrategyFactory[Tiling]):
             indices = tuple(0 for _ in all_gcps)
             for direction in [Left, Right]:
                 yield RequirementPlacementStrategy(all_gcps, indices, direction)
-            yield comb_class.add_obstructions(all_gcps)
 
     @classmethod
     def from_dict(cls, d: dict) -> "RowInsertionFactory":

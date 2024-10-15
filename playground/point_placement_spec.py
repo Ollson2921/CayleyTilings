@@ -4,7 +4,7 @@ from gridded_cayley_permutations import Tiling, GriddedCayleyPerm
 from cayley_permutations import CayleyPermutation
 
 
-basis = "123_11"
+basis = "021"
 basis_patterns = [CayleyPermutation.standardise(p) for p in basis.split("_")]
 
 rules = []

@@ -162,6 +162,7 @@ class PointPlacement:
         if direction not in self.DIRECTIONS:
             raise ValueError(f"Direction {direction} is not a valid direction.")
         cells = []
+        print(requirement_list)
         for idx, gcp in zip(indices, requirement_list):
             cells.append(gcp.positions[idx])
         cells = sorted(set(cells))

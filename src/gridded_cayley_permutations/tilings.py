@@ -252,14 +252,6 @@ class Tiling(CombinatorialClass):
                 point_rows.add(row)
         return point_rows
 
-    def point_cols(self):
-        """Returns the set of columns which don't contain points."""
-        point_cols = set()
-        for col in range(self.dimensions[0]):
-            for row in range(self.dimensions[1]):
-                if (col, row) in self.point_cells():
-                    point_cols.add(col)
-                    break
 
     def cells_in_row(self, row: int):
         """Returns the set of active cells in the given row."""
