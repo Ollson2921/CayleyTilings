@@ -157,7 +157,7 @@ class GriddedCayleyPerm:
             if cell[1] == row:
                 values.append(value)
         return values
-    
+
     def indices_in_row(self, row: int) -> List[int]:
         """Returns the indices of the gridded Cayley permutation that are in the row."""
         indices = []
@@ -309,35 +309,39 @@ class GriddedCayleyPerm:
         return GriddedCayleyPerm(
             CayleyPermutation.standardise(new_pattern), new_positions
         )
-    
-    def shifts(self, index, direction):
+
+    def shifts(self, direction, index):
         """Returns all ways to shift points in a Cayley permutation between two rows or columns"""
-        if direction == 0: #Column Shift
-            indeces = sorted(self.indices_in_col(index) + self.indices_in_col(index + 1))
-            cutoff = indeces[-1]+1
-            for p in indeces + [cutoff]:
+        if direction == 0:  # Column Shift
+            indices = sorted(
+                self.indices_in_col(index) + self.indices_in_col(index + 1)
+            )
+            cutoff = indices[-1] + 1
+            for p in indices + [cutoff]:
                 new_positions = list(self.positions)
-                new_positions[indeces[0]:cutoff] = [(index + int(q >= p),self.positions[q][1]) for q in indeces]
-                yield GriddedCayleyPerm(self.pattern,new_positions)
-        if direction == 1: #Row Shift
-            values = list(set(self.values_in_row(index) + self.values_in_row(index + 1)))
-            cutoff = values[-1]+1
-            pointer = {value : list() for value in values}
+                new_positions[indices[0] : cutoff] = [
+                    (index + int(q >= p), self.positions[q][1]) for q in indices
+                ]
+                yield GriddedCayleyPerm(self.pattern, new_positions)
+        if direction == 1:  # Row Shift
+            values = list(
+                set(self.values_in_row(index) + self.values_in_row(index + 1))
+            )
+            cutoff = values[-1] + 1
+            pointer = {value: list() for value in values}
             for i in self.indices_in_row(index) + self.indices_in_row(index + 1):
                 pointer[self.pattern[i]].append(i)
             for p in values + [cutoff]:
                 new_positions = list(self.positions)
                 for q in values:
-                    for i in pointer[q]:                
-                        new_positions[i] = (self.positions[i][0],index + int(q >= p))
-                yield GriddedCayleyPerm(self.pattern,new_positions)
-                
+                    for i in pointer[q]:
+                        new_positions[i] = (self.positions[i][0], index + int(q >= p))
+                yield GriddedCayleyPerm(self.pattern, new_positions)
 
-    def contains_index(self, direction: int, indices) -> bool:
-        """Returns True if the gridded Cayley permutation contains a point in the row/cols in indices
-        (where if direction = 0 then checks cols, else rows).
-        (hence True if for any cell in self.positions, cell[direction] == int for int in indices).
-        """
+    def contains_index(self, direction: int, index: int) -> bool:
+        """Returns True if the gridded Cayley permutation contains a point in the row/cols at index or index+1.
+        (where if direction = 0 then checks cols, else rows)."""
+        indices = [index, index + 1]
         for cell in self.positions:
             if cell[direction] in indices:
                 return True

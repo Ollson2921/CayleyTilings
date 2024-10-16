@@ -278,11 +278,11 @@ class Tiling(CombinatorialClass):
         return self.add_obstructions(req_list).is_empty()
 
     ## Fusion methods
-    def fuse(self, direction, indices) -> "Tiling":
+    def fuse(self, direction: int, index: int) -> "Tiling":
         """If direction = 0 then tries to fuse together the columns
         at the given indices, else if direction = 1 then tries to fuse the rows.
         If successful returns the new tiling, else returns None."""
-        obs_and_reqs = self.is_fuseable(direction, indices)
+        obs_and_reqs = self.is_fuseable(direction, index)
         if not obs_and_reqs:
             return
         else:
@@ -290,34 +290,34 @@ class Tiling(CombinatorialClass):
             # AO: if two row/cols are fuseable then can we just remove one of them and tidy up?
             pass
 
-    def is_fuseable(self, direction: int, indices) -> bool:
+    def is_fuseable(self, direction: int, index: int) -> bool:
         """Checks if the columns/rows are fuseable, if so returns the
         obstructions and requirements else returns None."""
         ob_list = [
-            ob for ob in self.obstructions if ob.contains_index(direction, indices)
+            ob for ob in self.obstructions if ob.contains_index(direction, index)
         ]
         req_list = [
             reqs
             for reqs in self.requirements
-            if any([req.contains_index(direction, indices) for req in reqs])
+            if any([req.contains_index(direction, index) for req in reqs])
         ]
-        obs_in_fusion = self.check_shifts(direction, indices, ob_list)
+        obs_in_fusion = self.check_shifts(direction, index, ob_list)
         if not obs_in_fusion:
             return False
         req_lists_in_fusion = []
         for reqs in req_list:
-            reqs_in_fusion = self.check_shifts(direction, indices, reqs)
+            reqs_in_fusion = self.check_shifts(direction, index, reqs)
             if not reqs_in_fusion:
                 return False
             req_lists_in_fusion.append(reqs_in_fusion)
         return obs_in_fusion, req_lists_in_fusion
 
-    def check_shifts(self, direction: int, indices, ob_list) -> bool:
+    def check_shifts(self, direction: int, index: int, ob_list) -> bool:
         obs_in_fusion = []
         while len(ob_list) > 0:
             ob = ob_list.pop()
             obs_in_fusion.append(ob)
-            for shift in ob.shifts(direction, indices):
+            for shift in ob.shifts(direction, index):
                 if shift not in ob_list:
                     return False
                 else:
