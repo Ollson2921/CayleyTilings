@@ -11,6 +11,7 @@ from .strategies import (
     LessThanOrEqualRowColSeparationStrategy,
     RowInsertionFactory,
     ColInsertionFactory,
+    FusionFactory,
 )
 
 
@@ -45,6 +46,7 @@ class TileScopePack(StrategyPack):
             inferral_strats=[
                 RemoveEmptyRowsAndColumnsStrategy(),
                 LessThanRowColSeparationStrategy(),
+                FusionFactory(),
             ],  # Iterable[Strategy]
             expansion_strats=[
                 [

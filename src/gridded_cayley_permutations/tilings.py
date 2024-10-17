@@ -145,6 +145,7 @@ class Tiling(CombinatorialClass):
             for ob in self.obstructions
             if not (ob.positions[0][1] in rows or ob.positions[0][0] in cols)
         ]
+        print(new_obstructions)
 
         new_obstructions = rc_map.map_gridded_cperms(new_obstructions)
 
@@ -282,21 +283,20 @@ class Tiling(CombinatorialClass):
         """If direction = 0 then tries to fuse together the columns
         at the given indices, else if direction = 1 then tries to fuse the rows.
         If successful returns the new tiling, else returns None."""
-        assert self.is_fuseable(direction,index)
         if direction == 0:
-            return self.delete_rows_and_columns([index],[])
+            return self.delete_rows_and_columns([index], [])
         else:
-            return self.delete_rows_and_columns([],[index])
+            return self.delete_rows_and_columns([], [index])
 
-    def is_fuseable(self, direction: int, index: int, allow_requirements = False) -> bool:
+    def is_fuseable(self, direction: int, index: int, allow_requirements=False) -> bool:
         """Checks if the columns/rows are fuseable, if so returns the
         obstructions and requirements else returns None."""
-        assert direction==0 or direction==1
+        assert direction == 0 or direction == 1
         ob_list = [
             ob for ob in self.obstructions if ob.contains_index(direction, index)
         ]
         if not self.check_shifts(direction, index, ob_list):
-            False
+            return False
         for reqs in self.requirements:
             if any([req.contains_index(direction, index) for req in reqs]):
                 if not allow_requirements:
@@ -307,10 +307,11 @@ class Tiling(CombinatorialClass):
 
     def check_shifts(self, direction: int, index: int, ob_list) -> bool:
         while len(ob_list) > 0:
-            ob = ob_list.pop()
+            ob = ob_list[0]
             for shift in ob.shifts(direction, index):
                 if shift not in ob_list:
                     return False
+                ob_list.remove(shift)
         return True
 
     ### CSS methods

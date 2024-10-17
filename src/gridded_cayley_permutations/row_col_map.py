@@ -24,7 +24,10 @@ class RowColMap:
         Map a gridded Cayley permutation according to the row and column maps.
         """
         new_positions = []
+        print(gcp)
+        print(self.col_map, self.row_map)
         for cell in gcp.positions:
+            print(cell)
             new_cell = (self.col_map[cell[0]], self.row_map[cell[1]])
             new_positions.append((new_cell))
         return GriddedCayleyPerm(gcp.pattern, new_positions)

@@ -17,3 +17,5 @@ from .row_column_separation import (
     LessThanRowColSeparationStrategy,
     LessThanOrEqualRowColSeparationStrategy,
 )
+
+from .fusion import FusionFactory
