@@ -18,7 +18,7 @@ class RequirementInsertionStrategy(DisjointUnionStrategy[Tiling, GriddedCayleyPe
     def decomposition_function(self, comb_class: Tiling) -> Tuple[Tiling, ...]:
         return (
             comb_class.add_obstructions(self.gcps),
-            comb_class.add_requirment_list(self.gcps),
+            comb_class.add_requirement_list(self.gcps),
         )
 
     def extra_parameters(

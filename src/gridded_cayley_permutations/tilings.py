@@ -233,7 +233,7 @@ class Tiling(CombinatorialClass):
             self.obstructions, self.requirements + tuple(requirements), self.dimensions
         )
 
-    def add_requirment_list(
+    def add_requirement_list(
         self, requirement_list: Iterable[GriddedCayleyPerm]
     ) -> "Tiling":
         """

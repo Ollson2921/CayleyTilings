@@ -310,7 +310,7 @@ class GriddedCayleyPerm:
             CayleyPermutation.standardise(new_pattern), new_positions
         )
 
-    def shifts(self, direction, index):
+    def shifts(self, direction: int, index: int) -> Iterator["GriddedCayleyPerm"]:
         """Returns all ways to shift points in a Cayley permutation between two rows or columns"""
         if direction == 0:  # Column Shift
             indices = sorted(
