@@ -18,4 +18,4 @@ from .row_column_separation import (
     LessThanOrEqualRowColSeparationStrategy,
 )
 
-from .fusion import FusionFactory
+from .fusion import FusionFactory, FusionStrategy
