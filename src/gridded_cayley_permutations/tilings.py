@@ -142,13 +142,12 @@ class Tiling(CombinatorialClass):
         rc_map = RowColMap(col_map, row_map)
         new_obstructions = []
         for ob in self.obstructions:
-            for cell in ob.positions:
-                if cell[0] in cols:
-                    new_obstructions.append(ob)
-                    continue
-                if cell[1] in rows:
-                    new_obstructions.append(ob)
-                    continue
+            if any([cell[0] in cols for cell in ob.positions]):
+                new_obstructions.append(ob)
+                continue
+            if any([cell[1] in rows for cell in ob.positions]):
+                new_obstructions.append(ob)
+                continue
         print(new_obstructions)
 
         new_obstructions = rc_map.map_gridded_cperms(new_obstructions)
