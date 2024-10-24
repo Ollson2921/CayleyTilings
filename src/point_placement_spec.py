@@ -4,7 +4,7 @@ from gridded_cayley_permutations import Tiling, GriddedCayleyPerm
 from cayley_permutations import CayleyPermutation
 
 
-basis = "021"
+basis = "012_00"
 basis_patterns = [CayleyPermutation.standardise(p) for p in basis.split("_")]
 
 rules = []
@@ -18,6 +18,6 @@ scope = TileScope(tiling, TileScopePack.point_placement(), debug=False, ruledb=r
 spec = scope.auto_search()
 print(spec)
 spec.show()
-for i in range(10):
-    print(spec.count_objects_of_size(i))
-print(spec.get_genf())
+# for i in range(10):
+#     print(spec.count_objects_of_size(i))
+# print(spec.get_genf())

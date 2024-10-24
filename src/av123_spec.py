@@ -92,9 +92,11 @@ tiling10 = rule8.children[0]
 # print(rule9)
 
 for strategy in strategies.FusionFactory()(tiling10):
-    print(strategy)
-    print(strategy(tiling10))
-    print("")
+    # print(strategy)
+    rule = strategy(tiling10)
+    print(rule)
+    tiling11 = rule.children[0]
+    print(tiling11)
 
 
 # strategy = strategies.FusionStrategy(1, 0)(tiling)

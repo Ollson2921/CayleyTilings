@@ -33,21 +33,21 @@ class FusionStrategy(Strategy[Tiling, GriddedCayleyPerm]):
             ignore_parent=False, inferrable=True, possibly_empty=False, workable=True
         )
 
-    def __call__(
-        self,
-        comb_class: Tiling,
-        children: Optional[Tuple[Tiling, ...]] = None,
-    ):
-        if children is None:
-            children = self.decomposition_function(comb_class)
-            # if children is None:
-            #     raise StrategyDoesNotApply("Strategy does not apply")
-        # return FusionRule(self, comb_class, children=children)
-        return children
+    # def __call__(
+    #     self,
+    #     comb_class: Tiling,
+    #     children: Optional[Tuple[Tiling, ...]] = None,
+    # ):
+    #     if children is None:
+    #         children = self.decomposition_function(comb_class)
+    #         # if children is None:
+    #         #     raise StrategyDoesNotApply("Strategy does not apply")
+    #     # return FusionRule(self, comb_class, children=children)
+    #     return children
 
     def decomposition_function(self, tiling: Tiling) -> Tiling:
         # if tiling.is_fuseable(self.direction, self.index):
-        return tiling.fuse(self.direction, self.index)
+        return (tiling.fuse(self.direction, self.index),)
         # raise AttributeError("Trying to fuse a tiling that does not fuse")
 
     def can_be_equivalent(self) -> bool:
@@ -206,7 +206,7 @@ class FusionStrategy(Strategy[Tiling, GriddedCayleyPerm]):
     def formal_step(self) -> str:
         fusing = "rows" if self.direction is 1 else "columns"
         idx = self.index
-        return f"fuse {fusing} {idx} and {idx+1}"
+        return f"Fuse {fusing} {idx} and {idx+1}"
 
     # pylint: disable=arguments-differ
     def backward_map(
@@ -279,6 +279,7 @@ class FusionStrategy(Strategy[Tiling, GriddedCayleyPerm]):
 
 class FusionFactory(StrategyFactory[Tiling]):
     def __call__(self, comb_class: Tiling):
+        print("Doing fusion!")
         for direction in [1, 0]:
             for index in range(comb_class.dimensions[direction] - 1):
                 if comb_class.is_fuseable(direction, index):

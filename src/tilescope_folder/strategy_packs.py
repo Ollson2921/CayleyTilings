@@ -42,11 +42,11 @@ class TileScopePack(StrategyPack):
             initial_strats=[
                 FactorStrategy(),
                 LessThanOrEqualRowColSeparationStrategy(),
+                FusionFactory(),
             ],  # Iterable[Strategy]
             inferral_strats=[
                 RemoveEmptyRowsAndColumnsStrategy(),
                 LessThanRowColSeparationStrategy(),
-                FusionFactory(),
             ],  # Iterable[Strategy]
             expansion_strats=[
                 [
