@@ -39,7 +39,7 @@ class AbstractFactorStrategy:
         """
         Return a string that describe the operation performed on the tiling.
         """
-        return "Factor the tiling into factors."
+        return "Factor the tiling into factors"
 
     def backward_map(
         self,

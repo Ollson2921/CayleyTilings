@@ -279,7 +279,6 @@ class FusionStrategy(Strategy[Tiling, GriddedCayleyPerm]):
 
 class FusionFactory(StrategyFactory[Tiling]):
     def __call__(self, comb_class: Tiling):
-        print("Doing fusion!")
         for direction in [1, 0]:
             for index in range(comb_class.dimensions[direction] - 1):
                 if comb_class.is_fuseable(direction, index):

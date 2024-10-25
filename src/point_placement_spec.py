@@ -1,4 +1,4 @@
-from tilescope import TileScope, TileScopePack
+from tilescope_folder import TileScope, TileScopePack
 from comb_spec_searcher.rule_db import RuleDBForest
 from gridded_cayley_permutations import Tiling, GriddedCayleyPerm
 from cayley_permutations import CayleyPermutation
