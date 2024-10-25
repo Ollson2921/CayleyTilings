@@ -46,6 +46,7 @@ class FusionStrategy(Strategy[Tiling, GriddedCayleyPerm]):
     #     return children
 
     def decomposition_function(self, tiling: Tiling) -> Tiling:
+        print("Doing fusion!")
         # if tiling.is_fuseable(self.direction, self.index):
         return (tiling.fuse(self.direction, self.index),)
         # raise AttributeError("Trying to fuse a tiling that does not fuse")
@@ -64,12 +65,14 @@ class FusionStrategy(Strategy[Tiling, GriddedCayleyPerm]):
         #     for ass, gps in zip(comb_class.assumptions, algo.assumptions_fuse_counters)
         # )
         # return new_ass in fused_assumptions
+        """TODO: We told this to return true to make it work but for tracked tilings and counting will need to change"""
+        return True
         raise NotImplementedError
 
     def shifts(
         self, comb_class: Tiling, children: Optional[Tuple[Tiling, ...]] = None
     ) -> Tuple[int, ...]:
-        # return (0,)
+        return (0,)
         raise NotImplementedError
 
     def constructor(
@@ -279,6 +282,7 @@ class FusionStrategy(Strategy[Tiling, GriddedCayleyPerm]):
 
 class FusionFactory(StrategyFactory[Tiling]):
     def __call__(self, comb_class: Tiling):
+        # print("Trying fusion")
         for direction in [1, 0]:
             for index in range(comb_class.dimensions[direction] - 1):
                 if comb_class.is_fuseable(direction, index):

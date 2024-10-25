@@ -4,7 +4,7 @@ from gridded_cayley_permutations import Tiling, GriddedCayleyPerm
 from cayley_permutations import CayleyPermutation
 
 
-basis = "012_00"
+basis = "1234"
 basis_patterns = [CayleyPermutation.standardise(p) for p in basis.split("_")]
 
 rules = []
@@ -13,7 +13,7 @@ tiling = Tiling(
     [],
     (1, 1),
 )
-ruledb = RuleDBForest()
+ruledb = RuleDBForest(reverse=False)
 scope = TileScope(tiling, TileScopePack.point_placement(), debug=False, ruledb=ruledb)
 spec = scope.auto_search()
 print(spec)
