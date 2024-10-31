@@ -210,8 +210,6 @@ class Tiling(CombinatorialClass):
         """
         Returns a new tiling with the given gridded Cayley permutations added as obstructions.
         """
-        # print(gcps)
-        # print(self.obstructions + tuple(gcps))
         return Tiling(
             self.obstructions + tuple(gcps), self.requirements, self.dimensions
         )

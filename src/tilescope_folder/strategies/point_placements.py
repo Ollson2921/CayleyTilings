@@ -207,4 +207,4 @@ class ColInsertionFactory(StrategyFactory[Tiling]):
         return f"{self.__class__.__name__}()"
 
     def __str__(self) -> str:
-        return "Row insertion"
+        return "Column insertion"

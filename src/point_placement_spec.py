@@ -5,12 +5,33 @@ from cayley_permutations import CayleyPermutation
 from gridded_cayley_permutations.mapped_tiling import Parameter, MappedTiling
 from gridded_cayley_permutations.row_col_map import RowColMap
 
-P1 = Parameter(Tiling([GriddedCayleyPerm(CayleyPermutation([0,1]), [(1,0),(1,0)] )], [], (2,1)), RowColMap({0:0,1:0},{0:0}))
-P2 =  Parameter(Tiling([GriddedCayleyPerm(CayleyPermutation([1,0]), [(0,0),(1,0)] )], [], (2,1)), RowColMap({0:0},{0:0,1:0}))
+P1 = Parameter(
+    Tiling(
+        [GriddedCayleyPerm(CayleyPermutation([0, 1]), [(1, 0), (1, 0)])], [], (2, 1)
+    ),
+    RowColMap({0: 0, 1: 0}, {0: 0}),
+)
+P2 = Parameter(
+    Tiling(
+        [GriddedCayleyPerm(CayleyPermutation([1, 0]), [(0, 0), (1, 0)])], [], (2, 1)
+    ),
+    RowColMap({0: 0}, {0: 0, 1: 0}),
+)
 
-M = MappedTiling(Tiling([GriddedCayleyPerm(CayleyPermutation([0,1,2]), [(0,0),(0,0),(0,0)] )], [], (1,1)), [P1])
+M = MappedTiling(
+    Tiling(
+        [GriddedCayleyPerm(CayleyPermutation([0, 1, 2]), [(0, 0), (0, 0), (0, 0)])],
+        [],
+        (1, 1),
+    ),
+    [P1],
+)
 
-print(M.add_obstructions([GriddedCayleyPerm(CayleyPermutation([0,2,1]), [(0,0)])]).parameters)
+print(
+    M.add_obstructions(
+        [GriddedCayleyPerm(CayleyPermutation([0, 2, 1]), [(0, 0)])]
+    ).parameters
+)
 # basis = "000"
 
 # basis_patterns = [CayleyPermutation.standardise(p) for p in basis.split("_")]
