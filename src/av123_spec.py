@@ -16,7 +16,7 @@ from gridded_cayley_permutations.point_placements import (
 )
 
 
-basis = "012_00"
+basis = "000"
 basis_patterns = [CayleyPermutation.standardise(p) for p in basis.split("_")]
 
 rules = []

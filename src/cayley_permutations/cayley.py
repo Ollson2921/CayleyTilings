@@ -16,7 +16,7 @@ class CayleyPermutation:
     1021
     """
 
-    def __init__(self, cperm: Iterable[int]):
+    def __init__(self, cperm: Iterable[int], validate = False):
         """
         Checks that the input is a Cayley permutation and converts it to zero based if not already.
         """
@@ -26,16 +26,16 @@ class CayleyPermutation:
             raise TypeError(
                 "Input to CayleyPermutation must be an iterable of ints."
             ) from error
+        if validate:
+            if len(self.cperm) != 0:
+                for val in range(1, max(self.cperm)):
+                    if val not in self.cperm:
+                        raise ValueError(
+                            "Input to CayleyPermutation must be a Cayley permutation."
+                        )
 
-        if len(self.cperm) != 0:
-            for val in range(1, max(self.cperm)):
-                if val not in self.cperm:
-                    raise ValueError(
-                        "Input to CayleyPermutation must be a Cayley permutation."
-                    )
-
-            if 0 not in self.cperm:
-                self.cperm = tuple(x - 1 for x in self.cperm)
+                if 0 not in self.cperm:
+                    self.cperm = tuple(x - 1 for x in self.cperm)
 
     def __eq__(self, other) -> bool:
         return self.cperm == other.cperm

@@ -9,23 +9,24 @@ class GriddedCayleyPerm:
     """A Cayley permutation as a gridding."""
 
     def __init__(
-        self, pattern: CayleyPermutation, positions: Tuple[Tuple[int, int]]
+        self, pattern: CayleyPermutation, positions: Tuple[Tuple[int, int]], validate = False
     ) -> None:
         self.pattern = pattern
         self.positions = tuple(tuple(cell) for cell in positions)
+        
+        if validate:
+            for i in range(len(self.positions)):
+                if self.positions[i][0] < 0 or self.positions[i][1] < 0:
+                    raise ValueError("Positions must be positive values.")
 
-        for i in range(len(self.positions)):
-            if self.positions[i][0] < 0 or self.positions[i][1] < 0:
-                raise ValueError("Positions must be positive values.")
-
-        if len(self.positions) != len(self.pattern):
-            if len(self.positions) == 1:
-                self.positions = self.positions * len(self.pattern)
-            else:
-                raise ValueError(
-                    "Number of positions must be equal to number of points in Cayley permutation."
-                )
-        assert not self.contradictory()
+            if len(self.positions) != len(self.pattern):
+                if len(self.positions) == 1:
+                    self.positions = self.positions * len(self.pattern)
+                else:
+                    raise ValueError(
+                        "Number of positions must be equal to number of points in Cayley permutation."
+                    )
+            assert not self.contradictory()
 
     def contradictory(self) -> bool:
         """Checks if the points of the gridding
