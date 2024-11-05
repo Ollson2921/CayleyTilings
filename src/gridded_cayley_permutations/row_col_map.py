@@ -172,5 +172,13 @@ class RowColMap:
             tiling.obstructions
         ), self.preimage_of_requirements(tiling.requirements)
 
+    def preimage_of_cell(self, cell: Tuple[int, int]) -> Tuple[int, int]:
+        """Return the preimage of the cell."""
+        all_cells = []
+        for col in self.preimages_of_col(cell[0]):
+            for row in self.preimages_of_row(cell[1]):
+                all_cells.append((col, row))
+        return all_cells
+
     def __str__(self) -> str:
         return f"RowColMap({self.col_map}, {self.row_map})"

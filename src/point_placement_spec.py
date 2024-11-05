@@ -27,11 +27,22 @@ M = MappedTiling(
     [P1],
 )
 
-print(
-    M.add_obstructions(
-        [GriddedCayleyPerm(CayleyPermutation([0, 2, 1]), [(0, 0),(0,0),(0,0)])]
-    ).parameters
-)
+# print(
+#     M.add_obstructions(
+#         [GriddedCayleyPerm(CayleyPermutation([0, 2, 1]), [(0, 0), (0, 0), (0, 0)])]
+#     ).parameters
+# )
+
+print(M.tiling)
+for param in M.parameters:
+    print(param.param)
+    print(param.map)
+
+placed_point = M.point_placement((0, 0), 3)
+print(str(placed_point.tiling))
+for param in placed_point.parameters:
+    print(param.param)
+    print(param.map)
 # basis = "000"
 
 # basis_patterns = [CayleyPermutation.standardise(p) for p in basis.split("_")]
