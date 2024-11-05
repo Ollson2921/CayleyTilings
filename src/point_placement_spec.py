@@ -29,7 +29,7 @@ M = MappedTiling(
 
 print(
     M.add_obstructions(
-        [GriddedCayleyPerm(CayleyPermutation([0, 2, 1]), [(0, 0)])]
+        [GriddedCayleyPerm(CayleyPermutation([0, 2, 1]), [(0, 0),(0,0),(0,0)])]
     ).parameters
 )
 # basis = "000"
