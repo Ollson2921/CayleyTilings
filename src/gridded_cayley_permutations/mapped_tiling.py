@@ -48,7 +48,6 @@ class MappedTiling:
         new_parameters = []
         for parameter in self.parameters:
             new_parameter = parameter.param.add_obstructions(parameter.map.preimage_of_obstructions(obstructions))
-            print(new_parameter)
             new_parameters.append(Parameter(new_parameter,parameter.map))
         return MappedTiling(self.tiling.add_obstructions(obstructions),new_parameters)
     
