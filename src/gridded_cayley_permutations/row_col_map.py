@@ -53,6 +53,7 @@ class RowColMap:
         """
         for cols, rows in product(self.product_of_cols(gcp), self.product_of_rows(gcp)):
             new_positions = tuple(zip(cols, rows))
+            print(GriddedCayleyPerm(gcp.pattern, new_positions))
             yield GriddedCayleyPerm(gcp.pattern, new_positions)
 
     def product_of_rows(self, gcp: GriddedCayleyPerm) -> Iterator[Tuple[int, ...]]:
