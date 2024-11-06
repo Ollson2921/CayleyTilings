@@ -47,6 +47,9 @@ class Parameter:
     def __repr__(self):
         return str((repr(self.param), str(self.map)))
 
+    def __str__(self) -> str:
+        return str(self.param) + "\n" + str(self.map)
+
 
 class MappedTiling:
 
@@ -107,3 +110,15 @@ class MappedTiling:
                 new_col_map = parameter.new_row_col_map(cell)
                 new_parameters.append(Parameter(new_param, new_col_map))
         return MappedTiling(new_tiling, new_parameters)
+
+    def __repr__(self):
+        return str((repr(self.tiling), [repr(p) for p in self.parameters]))
+
+    def __str__(self) -> str:
+        return (
+            str(self.tiling)
+            + "\n"
+            + "Parameters:"
+            + "\n"
+            + "\n".join([str(p) for p in self.parameters])
+        )
