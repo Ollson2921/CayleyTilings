@@ -38,13 +38,13 @@ M = MappedTiling(
 #     print(param.param)
 #     print(param.map)
 
-placed_point = M.point_placement((0, 0), 3)
+placed_point = M.point_placement((0, 0), 3).pop_parameter(0).remove_empty_rows_and_columns()
 print(placed_point)
 # for param in placed_point.parameters:
 #     print(param.param)
 #     print(param.map)
 
-print(M)
+#print(M)
 # basis = "000"
 
 # basis_patterns = [CayleyPermutation.standardise(p) for p in basis.split("_")]

@@ -28,14 +28,14 @@ class Parameter:
         '''This bit moves the existing mappings'''
         for item in self.map.col_map.items():
             adjust = int(item[0] >= col_index)*number_of_cols
-            new_row_map[item[0] + adjust] = item[1] + adjust
+            new_col_map[item[0] + adjust] = item[1] + adjust
         for item in self.map.row_map.items():
             adjust = int(item[0] >= row_index)*number_of_rows
             new_row_map[item[0] + adjust] = item[1] + adjust
         '''This bit adds the new dictionary items'''
         original_col, original_row = self.map.col_map[col_index], self.map.row_map[row_index]
         for i in range(number_of_cols):
-            new_row_map[col_index + i] = original_col + i
+            new_col_map[col_index + i] = original_col + i
         for i in range(number_of_rows):
             new_row_map[row_index + i] = original_row + i
         return RowColMap(new_col_map, new_row_map)
@@ -131,6 +131,28 @@ class MappedTiling:
                 new_map = parameter.expand_row_col_map_at_index(2,2,cell[0],cell[1])
                 new_parameters.append(Parameter(new_param, new_map))
         return MappedTiling(new_tiling, new_parameters)
+
+    def remove_empty_rows_and_columns(self):
+        empty_cols, empty_rows = self.tiling.find_empty_rows_and_columns()
+        new_tiling = self.tiling.delete_rows_and_columns(empty_cols,empty_rows)
+        new_parameters =[]
+        for P in self.parameters:
+            col_preimages, row_preimages = P.map.preimages_of_cols(empty_cols), P.map.preimages_of_rows(empty_rows)
+            empty_in_parameter = P.param.find_empty_rows_and_columns()
+            assert set(col_preimages).issubset(set(empty_in_parameter[0]))
+            assert set(row_preimages).issubset(set(empty_in_parameter[1]))
+            new_parameter = P.param.delete_rows_and_columns(col_preimages,row_preimages)
+            new_col_map,new_row_map = P.map.col_map, P.map.row_map
+            for index in col_preimages:
+                del new_col_map[index]
+            for index in row_preimages:
+                del new_row_map[index]
+            new_map = RowColMap(new_col_map,new_row_map).standardise_map() 
+            new_parameters.append(Parameter(new_parameter,new_map))
+        return MappedTiling(new_tiling,new_parameters)
+
+
+
 
     def __repr__(self):
         return str((repr(self.tiling), [repr(p) for p in self.parameters]))

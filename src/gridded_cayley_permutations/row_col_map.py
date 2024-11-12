@@ -114,6 +114,13 @@ class RowColMap:
             if value == row:
                 keys.append(key)
         return keys
+    
+    def preimages_of_rows(self,rows):
+        keys = []
+        for item in self.row_map.items():
+            if item[1] in rows:
+                keys.append(item[0])
+        return keys
 
     def preimages_of_col_of_gcp(
         self, col: int, gcp: GriddedCayleyPerm
@@ -148,6 +155,34 @@ class RowColMap:
         for key, value in self.col_map.items():
             if value == col:
                 keys.append(key)
+        return keys
+    
+    def subset_of_map(self,col_values,row_values):
+        new_col_map, new_row_map = dict(), dict()
+        for index in col_values:
+            new_col_map[index] = self.col_map[index]
+        for index in row_values:
+            new_row_map[index]= self.row_map[index]
+        return RowColMap(new_col_map, new_row_map)
+    
+    def standardise_map(self):
+        keys,values = sorted(list(self.col_map.keys())), sorted(list(self.col_map.values()))
+        key_map, value_map = {key: keys.index(key) for key in keys}, {value : values.index(value) for value in values}
+        new_col_map = {key_map[key] : value_map[self.col_map[key]] for key in keys}
+        keys,values = sorted(list(self.row_map.keys())), sorted(list(self.row_map.values()))
+        key_map, value_map = {key: keys.index(key) for key in keys}, {value : values.index(value) for value in values}
+        new_row_map = {key_map[key] : value_map[self.row_map[key]] for key in keys}
+        return RowColMap(new_col_map,new_row_map)
+    
+    def standardised_subset(self,col_values,row_values):
+        return self.subset_of_map(col_values,row_values).standardise_map()
+
+
+    def preimages_of_cols(self,cols):
+        keys = []
+        for item in self.col_map.items():
+            if item[1] in cols:
+                keys.append(item[0])
         return keys
 
     def preimage_of_obstructions(
