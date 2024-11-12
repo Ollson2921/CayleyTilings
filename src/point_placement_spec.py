@@ -38,8 +38,8 @@ M = MappedTiling(
 #     print(param.param)
 #     print(param.map)
 
-# placed_point = M.point_placement((0, 0), 3)
-# print(str(placed_point.tiling))
+placed_point = M.point_placement((0, 0), 3)
+print(placed_point)
 # for param in placed_point.parameters:
 #     print(param.param)
 #     print(param.map)

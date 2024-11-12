@@ -20,29 +20,50 @@ class Parameter:
         self.param = tiling
         self.map = row_col_map
 
-    def new_row_col_map(self, cell):
-        """returns a new row_col_map for point placement"""
-        new_row_map = dict()
-        for item in self.map.row_map.items():
-            if item[0] < cell[0]:
-                new_row_map[item[0]] = item[1]
-            elif item[0] == cell[0]:
-                new_row_map[item[0]] = cell[0]
-                new_row_map[item[0] + 1] = cell[0] + 1
-                new_row_map[item[0] + 2] = cell[0] + 2
-            else:
-                new_row_map[item[0] + 2] = item[1] + 2
-        new_col_map = dict()
+    def expand_row_col_map_at_index(self,number_of_cols, number_of_rows, col_index, row_index):
+        ''' Adds number_of_cols new columns to the at col_index and 
+            Adds number_of_rows new rows to the map at row_index
+                Assumes we've modified the parameter and the tiling in the same way'''
+        new_col_map, new_row_map = dict(), dict()
+        '''This bit moves the existing mappings'''
         for item in self.map.col_map.items():
-            if item[0] < cell[0]:
-                new_col_map[item[0]] = item[1]
-            elif item[0] == cell[0]:
-                new_col_map[item[0]] = cell[0]
-                new_col_map[item[0] + 1] = cell[0] + 1
-                new_col_map[item[0] + 2] = cell[0] + 2
-            else:
-                new_col_map[item[0] + 2] = item[1] + 2
+            adjust = int(item[0] >= col_index)*number_of_cols
+            new_row_map[item[0] + adjust] = item[1] + adjust
+        for item in self.map.row_map.items():
+            adjust = int(item[0] >= row_index)*number_of_rows
+            new_row_map[item[0] + adjust] = item[1] + adjust
+        '''This bit adds the new dictionary items'''
+        original_col, original_row = self.map.col_map[col_index], self.map.row_map[row_index]
+        for i in range(number_of_cols):
+            new_row_map[col_index + i] = original_col + i
+        for i in range(number_of_rows):
+            new_row_map[row_index + i] = original_row + i
         return RowColMap(new_col_map, new_row_map)
+    
+
+    # def new_row_col_map(self, cell):
+    #     """returns a new row_col_map for point placement"""
+    #     new_row_map = dict()
+    #     for item in self.map.row_map.items():
+    #         if item[0] < cell[0]:
+    #             new_row_map[item[0]] = item[1]
+    #         elif item[0] == cell[0]:
+    #             new_row_map[item[0]] = cell[0]
+    #             new_row_map[item[0] + 1] = cell[0] + 1
+    #             new_row_map[item[0] + 2] = cell[0] + 2
+    #         else:
+    #             new_row_map[item[0] + 2] = item[1] + 2
+    #     new_col_map = dict()
+    #     for item in self.map.col_map.items():
+    #         if item[0] < cell[0]:
+    #             new_col_map[item[0]] = item[1]
+    #         elif item[0] == cell[0]:
+    #             new_col_map[item[0]] = cell[0]
+    #             new_col_map[item[0] + 1] = cell[0] + 1
+    #             new_col_map[item[0] + 2] = cell[0] + 2
+    #         else:
+    #             new_col_map[item[0] + 2] = item[1] + 2
+    #     return RowColMap(new_col_map, new_row_map)
 
     def __repr__(self):
         return str((repr(self.param), str(self.map)))
@@ -107,8 +128,8 @@ class MappedTiling:
                 new_param = PointPlacement(parameter.param).point_placement(
                     point, indices, direction
                 )[0]
-                new_col_map = parameter.new_row_col_map(cell)
-                new_parameters.append(Parameter(new_param, new_col_map))
+                new_map = parameter.expand_row_col_map_at_index(2,2,cell[0],cell[1])
+                new_parameters.append(Parameter(new_param, new_map))
         return MappedTiling(new_tiling, new_parameters)
 
     def __repr__(self):
