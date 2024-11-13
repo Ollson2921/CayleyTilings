@@ -66,6 +66,19 @@ class Factors:
         factors = sorted(sorted(f) for f in factors)
         return tuple(self.tiling.sub_tiling(factor) for factor in factors)
 
+    def find_factors_tracked(self):
+        self.combine_cells_in_row_or_col()
+        self.combine_cells_in_obs_and_reqs()
+        factors = []
+        for val in set(self.cells_dict.values()):
+            factor = []
+            for cell in self.cells:
+                if self.cells_dict[cell] == val:
+                    factor.append(cell)
+            factors.append(factor)
+        factors = sorted(sorted(f) for f in factors)
+        return factors
+
 
 class ShuffleFactors(Factors):
     def combine_cells_in_row_or_col(self):

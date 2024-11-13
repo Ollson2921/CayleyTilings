@@ -7,9 +7,15 @@ from gridded_cayley_permutations.row_col_map import RowColMap
 
 P1 = Parameter(
     Tiling(
-        [GriddedCayleyPerm(CayleyPermutation([0, 1]), [(1, 0), (1, 0)])], [], (2, 1)
+        [
+            GriddedCayleyPerm(CayleyPermutation([0, 1]), [(1, 0), (1, 0)]),
+            GriddedCayleyPerm(CayleyPermutation([0, 1]), [(0, 0), (0, 0)]),
+            GriddedCayleyPerm(CayleyPermutation([0, 1]), [(1, 0), (1, 0)]),
+        ],
+        [],
+        (3, 1),
     ),
-    RowColMap({0: 0, 1: 0}, {0: 0}),
+    RowColMap({0: 0, 1: 0, 2: 1}, {0: 0}),
 )
 P2 = Parameter(
     Tiling(
@@ -22,7 +28,7 @@ M = MappedTiling(
     Tiling(
         [GriddedCayleyPerm(CayleyPermutation([0, 1, 2]), [(0, 0), (0, 0), (0, 0)])],
         [],
-        (1, 1),
+        (2, 1),
     ),
     [P1],
 )
@@ -32,19 +38,19 @@ M = MappedTiling(
 #         [GriddedCayleyPerm(CayleyPermutation([0, 2, 1]), [(0, 0), (0, 0), (0, 0)])]
 #     ).parameters
 # )
-
-# print(M.tiling)
+print(M)
+print(M.find_factors())
 # for param in M.parameters:
 #     print(param.param)
 #     print(param.map)
 
-placed_point = M.point_placement((0, 0), 3).pop_parameter(0).remove_empty_rows_and_columns()
-print(placed_point)
+# placed_point = M.point_placement((0, 0), 0).remove_empty_rows_and_columns()
+# print(placed_point)
 # for param in placed_point.parameters:
 #     print(param.param)
 #     print(param.map)
 
-#print(M)
+# print(M)
 # basis = "000"
 
 # basis_patterns = [CayleyPermutation.standardise(p) for p in basis.split("_")]

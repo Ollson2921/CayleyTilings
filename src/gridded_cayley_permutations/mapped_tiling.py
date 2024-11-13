@@ -4,6 +4,7 @@ from copy import copy
 from itertools import product
 from math import factorial
 from comb_spec_searcher import CombinatorialClass
+from .factors import Factors
 
 from cayley_permutations import CayleyPermutation
 from .row_col_map import RowColMap
@@ -20,50 +21,38 @@ class Parameter:
         self.param = tiling
         self.map = row_col_map
 
-    def expand_row_col_map_at_index(self,number_of_cols, number_of_rows, col_index, row_index):
-        ''' Adds number_of_cols new columns to the at col_index and 
-            Adds number_of_rows new rows to the map at row_index
-                Assumes we've modified the parameter and the tiling in the same way'''
+    def expand_row_col_map_at_index(
+        self, number_of_cols, number_of_rows, col_index, row_index
+    ):
+        """Adds number_of_cols new columns to the at col_index and
+        Adds number_of_rows new rows to the map at row_index
+            Assumes we've modified the parameter and the tiling in the same way"""
         new_col_map, new_row_map = dict(), dict()
-        '''This bit moves the existing mappings'''
+        """This bit moves the existing mappings"""
         for item in self.map.col_map.items():
-            adjust = int(item[0] >= col_index)*number_of_cols
+            adjust = int(item[0] >= col_index) * number_of_cols
             new_col_map[item[0] + adjust] = item[1] + adjust
         for item in self.map.row_map.items():
-            adjust = int(item[0] >= row_index)*number_of_rows
+            adjust = int(item[0] >= row_index) * number_of_rows
             new_row_map[item[0] + adjust] = item[1] + adjust
-        '''This bit adds the new dictionary items'''
-        original_col, original_row = self.map.col_map[col_index], self.map.row_map[row_index]
+        """This bit adds the new dictionary items"""
+        original_col, original_row = (
+            self.map.col_map[col_index],
+            self.map.row_map[row_index],
+        )
         for i in range(number_of_cols):
             new_col_map[col_index + i] = original_col + i
         for i in range(number_of_rows):
             new_row_map[row_index + i] = original_row + i
         return RowColMap(new_col_map, new_row_map)
-    
 
-    # def new_row_col_map(self, cell):
-    #     """returns a new row_col_map for point placement"""
-    #     new_row_map = dict()
-    #     for item in self.map.row_map.items():
-    #         if item[0] < cell[0]:
-    #             new_row_map[item[0]] = item[1]
-    #         elif item[0] == cell[0]:
-    #             new_row_map[item[0]] = cell[0]
-    #             new_row_map[item[0] + 1] = cell[0] + 1
-    #             new_row_map[item[0] + 2] = cell[0] + 2
-    #         else:
-    #             new_row_map[item[0] + 2] = item[1] + 2
-    #     new_col_map = dict()
-    #     for item in self.map.col_map.items():
-    #         if item[0] < cell[0]:
-    #             new_col_map[item[0]] = item[1]
-    #         elif item[0] == cell[0]:
-    #             new_col_map[item[0]] = cell[0]
-    #             new_col_map[item[0] + 1] = cell[0] + 1
-    #             new_col_map[item[0] + 2] = cell[0] + 2
-    #         else:
-    #             new_col_map[item[0] + 2] = item[1] + 2
-    #     return RowColMap(new_col_map, new_row_map)
+    def reduce_row_col_map(self, col_preimages, row_preimages):
+        new_col_map, new_row_map = self.map.col_map.copy(), self.map.row_map.copy()
+        for index in col_preimages:
+            del new_col_map[index]
+        for index in row_preimages:
+            del new_row_map[index]
+        return RowColMap(new_col_map, new_row_map).standardise_map()
 
     def __repr__(self):
         return str((repr(self.param), str(self.map)))
@@ -128,31 +117,79 @@ class MappedTiling:
                 new_param = PointPlacement(parameter.param).point_placement(
                     point, indices, direction
                 )[0]
-                new_map = parameter.expand_row_col_map_at_index(2,2,cell[0],cell[1])
+                new_map = parameter.expand_row_col_map_at_index(
+                    2, 2, preimage_cell[0], preimage_cell[1]
+                )
                 new_parameters.append(Parameter(new_param, new_map))
         return MappedTiling(new_tiling, new_parameters)
 
     def remove_empty_rows_and_columns(self):
         empty_cols, empty_rows = self.tiling.find_empty_rows_and_columns()
-        new_tiling = self.tiling.delete_rows_and_columns(empty_cols,empty_rows)
-        new_parameters =[]
+        new_tiling = self.tiling.delete_rows_and_columns(empty_cols, empty_rows)
+        new_parameters = []
         for P in self.parameters:
-            col_preimages, row_preimages = P.map.preimages_of_cols(empty_cols), P.map.preimages_of_rows(empty_rows)
-            empty_in_parameter = P.param.find_empty_rows_and_columns()
-            assert set(col_preimages).issubset(set(empty_in_parameter[0]))
-            assert set(row_preimages).issubset(set(empty_in_parameter[1]))
-            new_parameter = P.param.delete_rows_and_columns(col_preimages,row_preimages)
-            new_col_map,new_row_map = P.map.col_map, P.map.row_map
-            for index in col_preimages:
-                del new_col_map[index]
-            for index in row_preimages:
-                del new_row_map[index]
-            new_map = RowColMap(new_col_map,new_row_map).standardise_map() 
-            new_parameters.append(Parameter(new_parameter,new_map))
-        return MappedTiling(new_tiling,new_parameters)
+            col_preimages, row_preimages = P.map.preimages_of_cols(
+                empty_cols
+            ), P.map.preimages_of_rows(empty_rows)
+            new_parameter = P.param.delete_rows_and_columns(
+                col_preimages, row_preimages
+            )
+            new_map = P.reduce_row_col_map(col_preimages, row_preimages)
+            new_parameters.append(Parameter(new_parameter, new_map))
+        return MappedTiling(new_tiling, new_parameters)
 
+    def find_factors(self):
+        t_factors = Factors(self.tiling).find_factors_tracked()
+        for parameter in self.parameters:
+            p_factors = Factors(parameter.param).find_factors_tracked()
+            all_factors = []  # list of tuple pairs, t_cells and p_cells
+            queue = t_factors
+            while queue:
+                t_factor = queue.pop()
+                final_t_factor = [t_factor]
+                final_p_factors = []
+                new_t_factors = [t_factor]
+                while True:
+                    new_p_factors = []
+                    for t_factor in new_t_factors:
+                        p_factors_so_far = self.map_t_factor_to_p_factor(
+                            t_factor, parameter, p_factors
+                        )
+                        p_factors = [p for p in p_factors if p not in p_factors_so_far]
+                        final_p_factors += p_factors_so_far
+                        new_p_factors += p_factors_so_far
+                    new_t_factors = []
+                    for p_factor in new_p_factors:
+                        temp = self.map_p_factor_to_t_factor(p_factor, parameter, queue)
+                        new_t_factors += temp
+                        queue = [t for t in queue if t not in temp]
+                    if not new_t_factors:
+                        break
+                    final_t_factor += new_t_factors
+                all_factors.append((final_t_factor, final_p_factors))
 
+    @staticmethod
+    def map_p_factor_to_t_factor(p_factor, parameter, t_factors):
+        """maps a factor of the parameter to a list of factors of the tiling"""
+        image_cells = set(
+            (parameter.map.col_map[cell[0]], parameter.map.row_map[cell[1]])
+            for cell in p_factor
+        )
+        return [
+            factor
+            for factor in t_factors
+            if any(cell in image_cells for cell in factor)
+        ]
 
+    @staticmethod
+    def map_t_factor_to_p_factor(t_factor, parameter, p_factors):
+        """maps a factor of the tiling to a list of parameters"""
+        preimage_cells = set(parameter.map.preimage_of_cell(cell) for cell in t_factor)
+        return [
+            factor
+            for factor in p_factors
+            if any(cell in preimage_cells for cell in factor)
+        ]
 
     def __repr__(self):
         return str((repr(self.tiling), [repr(p) for p in self.parameters]))
