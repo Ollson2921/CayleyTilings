@@ -18,7 +18,7 @@ from .point_placements import PointPlacement
 class Parameter:
     def __init__(self, tiling, row_col_map):
         """we may need to keep track of which direction the row_col_map goes"""
-        self.param = tiling
+        self.ghost = tiling
         self.map = row_col_map
 
     def expand_row_col_map_at_index(
@@ -47,6 +47,7 @@ class Parameter:
         return RowColMap(new_col_map, new_row_map)
 
     def reduce_row_col_map(self, col_preimages, row_preimages):
+        '''This function removes rows and collumns from the map and standardizes the output'''
         new_col_map, new_row_map = self.map.col_map.copy(), self.map.row_map.copy()
         for index in col_preimages:
             del new_col_map[index]
@@ -55,10 +56,10 @@ class Parameter:
         return RowColMap(new_col_map, new_row_map).standardise_map()
 
     def __repr__(self):
-        return str((repr(self.param), str(self.map)))
+        return str((repr(self.ghost), str(self.map)))
 
     def __str__(self) -> str:
-        return str(self.param) + "\n" + str(self.map)
+        return str(self.ghost) + "\n" + str(self.map)
 
 
 class MappedTiling:
@@ -85,7 +86,7 @@ class MappedTiling:
         """Here we assume the direction of row_col_map"""
         new_parameters = []
         for parameter in self.parameters:
-            new_parameter = parameter.param.add_obstructions(
+            new_parameter = parameter.ghost.add_obstructions(
                 parameter.map.preimage_of_obstructions(obstructions)
             )
             new_parameters.append(Parameter(new_parameter, parameter.map))
@@ -96,7 +97,7 @@ class MappedTiling:
         """Here we assume the direction of row_col_map"""
         new_parameters = []
         for parameter in self.parameters:
-            new_parameter = parameter.param.add_requirements(
+            new_parameter = parameter.ghost.add_requirements(
                 parameter.map.preimage_of_requirements(requirements)
             )
             new_parameters.append(Parameter(new_parameter, parameter.map))
@@ -114,7 +115,7 @@ class MappedTiling:
         for parameter in self.parameters:
             for preimage_cell in parameter.map.preimage_of_cell(cell):
                 point = [GriddedCayleyPerm(CayleyPermutation([0]), [preimage_cell])]
-                new_param = PointPlacement(parameter.param).point_placement(
+                new_param = PointPlacement(parameter.ghost).point_placement(
                     point, indices, direction
                 )[0]
                 new_map = parameter.expand_row_col_map_at_index(
@@ -131,7 +132,7 @@ class MappedTiling:
             col_preimages, row_preimages = P.map.preimages_of_cols(
                 empty_cols
             ), P.map.preimages_of_rows(empty_rows)
-            new_parameter = P.param.delete_rows_and_columns(
+            new_parameter = P.ghost.delete_rows_and_columns(
                 col_preimages, row_preimages
             )
             new_map = P.reduce_row_col_map(col_preimages, row_preimages)
@@ -141,12 +142,12 @@ class MappedTiling:
     def find_factors(self):
         t_factors = Factors(self.tiling).find_factors_tracked()
         for parameter in self.parameters:
-            p_factors = Factors(parameter.param).find_factors_tracked()
+            p_factors = Factors(parameter.ghost).find_factors_tracked()
             all_factors = []  # list of tuple pairs, t_cells and p_cells
             queue = t_factors
             while queue:
                 t_factor = queue.pop()
-                final_t_factor = [t_factor]
+                final_t_factor = t_factor
                 final_p_factors = []
                 new_t_factors = [t_factor]
                 while True:
@@ -156,7 +157,8 @@ class MappedTiling:
                             t_factor, parameter, p_factors
                         )
                         p_factors = [p for p in p_factors if p not in p_factors_so_far]
-                        final_p_factors += p_factors_so_far
+                        for P in p_factors_so_far:
+                            final_p_factors += P
                         new_p_factors += p_factors_so_far
                     new_t_factors = []
                     for p_factor in new_p_factors:
@@ -165,8 +167,15 @@ class MappedTiling:
                         queue = [t for t in queue if t not in temp]
                     if not new_t_factors:
                         break
-                    final_t_factor += new_t_factors
+                    for T in new_t_factors:
+                        final_t_factor += T
                 all_factors.append((final_t_factor, final_p_factors))
+            for factor in all_factors:
+                factor_tiling = self.tiling.sub_tiling(factor[0])
+                factor_ghost = parameter.ghost.sub_tiling(factor[1])
+                factor_map = parameter.map
+                yield(MappedTiling(factor_tiling, [Parameter(factor_ghost,factor_map)]).remove_empty_rows_and_columns())
+
 
     @staticmethod
     def map_p_factor_to_t_factor(p_factor, parameter, t_factors):
@@ -184,7 +193,9 @@ class MappedTiling:
     @staticmethod
     def map_t_factor_to_p_factor(t_factor, parameter, p_factors):
         """maps a factor of the tiling to a list of parameters"""
-        preimage_cells = set(parameter.map.preimage_of_cell(cell) for cell in t_factor)
+        preimage_cells = set()
+        for cell in t_factor:
+            preimage_cells = preimage_cells.union(parameter.map.preimage_of_cell(cell))
         return [
             factor
             for factor in p_factors

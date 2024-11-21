@@ -158,6 +158,7 @@ class RowColMap:
         return keys
 
     def subset_of_map(self, col_values, row_values):
+        '''restricts row/col map to only the col_values and row_values of the preimage'''
         new_col_map, new_row_map = dict(), dict()
         for index in col_values:
             new_col_map[index] = self.col_map[index]
@@ -166,16 +167,12 @@ class RowColMap:
         return RowColMap(new_col_map, new_row_map)
 
     def standardise_map(self):
-        keys, values = sorted(list(self.col_map.keys())), sorted(
-            list(self.col_map.values())
-        )
+        keys, values = list(set(self.col_map.keys())), list(set(self.col_map.values()))
         key_map, value_map = {key: keys.index(key) for key in keys}, {
             value: values.index(value) for value in values
         }
         new_col_map = {key_map[key]: value_map[self.col_map[key]] for key in keys}
-        keys, values = sorted(list(self.row_map.keys())), sorted(
-            list(self.row_map.values())
-        )
+        keys, values = list(set(self.row_map.keys())), list(set(self.row_map.values()))
         key_map, value_map = {key: keys.index(key) for key in keys}, {
             value: values.index(value) for value in values
         }
