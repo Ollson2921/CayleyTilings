@@ -40,12 +40,12 @@ ghost_tiling = Tiling(
 P1 = Parameter(
     ghost_tiling.add_obstructions(
         [
-            GriddedCayleyPerm(CayleyPermutation([0]), ((0, 1),)),
+            # GriddedCayleyPerm(CayleyPermutation([0]), ((0, 1),)),
             GriddedCayleyPerm(CayleyPermutation([0]), ((1, 0),)),
             GriddedCayleyPerm(CayleyPermutation([0]), ((2, 0),)),
             GriddedCayleyPerm(CayleyPermutation([0]), ((3, 0),)),
         ]
-    ),
+    ).add_requirement_list([GriddedCayleyPerm(CayleyPermutation([0]), ((0, 1),))]),
     RowColMap({0: 0, 1: 1, 2: 1, 3: 2}, {0: 0, 1: 1}),
 )
 P2 = Parameter(
@@ -63,10 +63,9 @@ P2 = Parameter(
 
 M = MappedTiling(base_tiling, [P1, P2])
 M = MappedTiling(base_tiling, [P2, P1])
+M.reap_contradictory_ghosts()
 print(M)
-print("FACTORS:")
-for factor in M.find_factors():
-    print("-------------------------------------")
-    print(factor)
-
-"""Only found one factor even though 2 parameters so should be at least 2? - Is it only working on the first parameter and forgetting about the second? - t_factors was empty at the start of the loop, I've fixed it."""
+# print("FACTORS:")
+# for factor in M.find_factors():
+#     print("-------------------------------------")
+#     print(factor)

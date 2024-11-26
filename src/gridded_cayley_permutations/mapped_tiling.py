@@ -21,6 +21,19 @@ class Parameter:
         self.ghost = tiling
         self.map = row_col_map
 
+    def is_contradictory(self, tiling: Tiling) -> bool:
+        """Returns True if the parameter is contradictory.
+        Is contradictory if any of the requirements in the ghost map to a gcp
+        containing an obstruction in the tiling
+        """
+        for req_list in self.ghost.requirements:
+            if all(
+                self.map.map_gridded_cperm(gcp).contains(tiling.obstructions)
+                for gcp in req_list
+            ):
+                return True
+        return False
+
     def expand_row_col_map_at_index(
         self, number_of_cols, number_of_rows, col_index, row_index
     ):
@@ -67,6 +80,23 @@ class MappedTiling:
     def __init__(self, tiling: Tiling, parameters: Iterable[Parameter]):
         self.tiling = tiling
         self.parameters = parameters
+
+    def reap_contradictory_ghosts(self):
+        """Returns True if the tiling is contradictory"""
+        for n in range(len(self.parameters)):
+            ghost = self.parameters[n]
+            if ghost.is_contradictory(self.tiling):
+                self.kill_ghost(n)
+
+    def kill_ghost(self, ghost_number):
+        """removes a ghost from the mapped tiling"""
+        new_ghost = self.parameters.pop(ghost_number)
+        for i in range(new_ghost.ghost.dimensions[0]):
+            for j in range(new_ghost.ghost.dimensions[1]):
+                new_ghost.ghost = new_ghost.ghost.add_obstruction(
+                    GriddedCayleyPerm(CayleyPermutation([0]), [(i, j)])
+                )
+        self.parameters.append(new_ghost)
 
     def pop_parameter(self, parameter_index=0):
         """removes the parameter at an index and creates a new mapped tiling"""
@@ -174,7 +204,6 @@ class MappedTiling:
                 factor_tiling = self.tiling.sub_tiling(factor[0])
                 factor_ghost = parameter.ghost.sub_tiling(factor[1])
                 factor_map = parameter.map
-                # print("ghost factor", factor_ghost)
                 yield (
                     MappedTiling(
                         factor_tiling, [Parameter(factor_ghost, factor_map)]
