@@ -47,7 +47,7 @@ class Parameter:
         return RowColMap(new_col_map, new_row_map)
 
     def reduce_row_col_map(self, col_preimages, row_preimages):
-        '''This function removes rows and collumns from the map and standardizes the output'''
+        """This function removes rows and collumns from the map and standardizes the output"""
         new_col_map, new_row_map = self.map.col_map.copy(), self.map.row_map.copy()
         for index in col_preimages:
             del new_col_map[index]
@@ -140,8 +140,8 @@ class MappedTiling:
         return MappedTiling(new_tiling, new_parameters)
 
     def find_factors(self):
-        t_factors = Factors(self.tiling).find_factors_tracked()
         for parameter in self.parameters:
+            t_factors = Factors(self.tiling).find_factors_tracked()
             p_factors = Factors(parameter.ghost).find_factors_tracked()
             all_factors = []  # list of tuple pairs, t_cells and p_cells
             queue = t_factors
@@ -174,8 +174,12 @@ class MappedTiling:
                 factor_tiling = self.tiling.sub_tiling(factor[0])
                 factor_ghost = parameter.ghost.sub_tiling(factor[1])
                 factor_map = parameter.map
-                yield(MappedTiling(factor_tiling, [Parameter(factor_ghost,factor_map)]).remove_empty_rows_and_columns())
-
+                # print("ghost factor", factor_ghost)
+                yield (
+                    MappedTiling(
+                        factor_tiling, [Parameter(factor_ghost, factor_map)]
+                    ).remove_empty_rows_and_columns()
+                )
 
     @staticmethod
     def map_p_factor_to_t_factor(p_factor, parameter, t_factors):
