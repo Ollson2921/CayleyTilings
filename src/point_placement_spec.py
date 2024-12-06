@@ -51,11 +51,11 @@ M2 = MappedTiling(ghost, [Parameter(tiling, RowColMap({0: 0, 1: 1}, {0: 0, 1: 1}
 #         [GriddedCayleyPerm(CayleyPermutation([0, 2, 1]), [(0, 0), (0, 0), (0, 0)])]
 #     ).parameters
 # )
-# print(M)
+print(M)
 
-for factor in M2.find_factors():
-    print("-------------------------------------")
-    print(factor)
+# for factor in M2.find_factors():
+#     print("-------------------------------------")
+#     print(factor)
 # for param in M.parameters:
 #     print(param.param)
 #     print(param.map)

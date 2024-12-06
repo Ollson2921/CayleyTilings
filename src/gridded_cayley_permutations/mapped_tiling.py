@@ -75,14 +75,22 @@ class Parameter:
         return str(self.ghost) + "\n" + str(self.map)
 
 
-class MappedTiling:
+class MappedTiling(CombinatorialClass):
 
-    def __init__(self, tiling: Tiling, parameters: Iterable[Parameter]):
+    def __init__(
+        self,
+        tiling: Tiling,
+        avoiding_parameters: Iterable[Parameter],
+        containing_parameters: Iterable[Iterable[Parameter]],
+        enumeration_parameters: Iterable[Iterable[Parameter]],
+    ):
         self.tiling = tiling
-        self.parameters = parameters
+        self.avoiding_parameters = avoiding_parameters
+        self.containing_parameters = containing_parameters
+        self.enumeration_parameters = enumeration_parameters
 
     def reap_contradictory_ghosts(self):
-        """Returns True if the tiling is contradictory"""
+        """Removes parameters which are contradictory"""
         for n in range(len(self.parameters)):
             ghost = self.parameters[n]
             if ghost.is_contradictory(self.tiling):
@@ -112,30 +120,39 @@ class MappedTiling:
         self.parameters.append(parameter)
 
     def add_obstructions(self, obstructions):
-        """adds obstructions to the tiling (and corrects the parameters)"""
-        """Here we assume the direction of row_col_map"""
-        new_parameters = []
-        for parameter in self.parameters:
+        """adds obstructions to the tiling (and corrects the parameters)
+        TODO: containing params should be lists of lists and update other params too."""
+        new_containing_parameters = []
+        for parameter in self.containing_parameters:
             new_parameter = parameter.ghost.add_obstructions(
                 parameter.map.preimage_of_obstructions(obstructions)
             )
-            new_parameters.append(Parameter(new_parameter, parameter.map))
-        return MappedTiling(self.tiling.add_obstructions(obstructions), new_parameters)
+            new_containing_parameters.append(Parameter(new_parameter, parameter.map))
+        return MappedTiling(
+            self.tiling.add_obstructions(obstructions),
+            [],
+            new_containing_parameters,
+            [],
+        )
 
     def add_requirements(self, requirements):
-        """adds requirements to the tiling (and corrects the parameters)"""
-        """Here we assume the direction of row_col_map"""
-        new_parameters = []
-        for parameter in self.parameters:
+        """adds requirements to the tiling (and corrects the parameters)
+        TODO: containing params should be lists of lists and update other params too."""
+        new_containing_parameters = []
+        for parameter in self.containing_parameters:
             new_parameter = parameter.ghost.add_requirements(
                 parameter.map.preimage_of_requirements(requirements)
             )
-            new_parameters.append(Parameter(new_parameter, parameter.map))
-        return MappedTiling(self.tiling.add_requirements(requirements), new_parameters)
+            new_containing_parameters.append(Parameter(new_parameter, parameter.map))
+        return MappedTiling(
+            self.tiling.add_requirements(requirements),
+            [],
+            new_containing_parameters,
+            [],
+        )
 
     def point_placement(self, cell, direction) -> "MappedTiling":
         """returns the point placement of a cell in a direction"""
-        """Here we assume the direction of row_col_map"""
         point = [GriddedCayleyPerm(CayleyPermutation([0]), [cell])]
         indices = (0,)
         new_tiling = PointPlacement(self.tiling).point_placement(
@@ -235,14 +252,56 @@ class MappedTiling:
             if any(cell in preimage_cells for cell in factor)
         ]
 
+    def __eq__(self, other) -> bool:
+        return (
+            self.tiling == other.tiling
+            and self.avoiding_parameters == other.avoiding_parameters
+            and self.containing_parameters == other.containing_parameters
+            and self.enumeration_parameters == other.enumeration_parameters
+        )
+
+    def __hash__(self) -> int:
+        return hash(
+            (
+                self.tiling,
+                tuple(self.avoiding_parameters),
+                tuple(self.containing_parameters),
+                tuple(self.enumeration_parameters),
+            )
+        )
+
+    def from_dict(self, d):
+        return MappedTiling(
+            Tiling.from_dict(d["tiling"]),
+            [Parameter.from_dict(p) for p in d["avoiding_parameters"]],
+            [[Parameter.from_dict(p) for p in ps] for ps in d["containing_parameters"]],
+            [
+                [Parameter.from_dict(p) for p in ps]
+                for ps in d["enumeration_parameters"]
+            ],
+        )
+
+    def is_empty(self) -> bool:
+        """TODO: is this right??"""
+        return self.tiling.is_empty()
+
     def __repr__(self):
-        return str((repr(self.tiling), [repr(p) for p in self.parameters]))
+        return str(
+            (
+                repr(self.tiling),
+                [repr(p) for p in self.avoiding_parameters],
+                [[repr(p) for p in ps] for ps in self.containing_parameters],
+                [[repr(p) for p in ps] for ps in self.enumeration_parameters],
+            )
+        )
 
     def __str__(self) -> str:
         return (
             str(self.tiling)
-            + "\n"
-            + "Parameters:"
-            + "\n"
-            + "\n".join([str(p) for p in self.parameters])
+            + "\nAvoiding parameters:\n"
+            + "\n".join([str(p) for p in self.avoiding_parameters])
+            + "\nContaining parameters:\n"
+            + "\n".join([str(p) for p in self.containing_parameters])
+            + "\nEnumeration parameters:\n"
+            + "\n".join([str(p) for p in self.enumeration_parameters])
         )
