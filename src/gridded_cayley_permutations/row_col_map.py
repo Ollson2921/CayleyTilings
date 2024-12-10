@@ -49,7 +49,7 @@ class RowColMap:
         self, gcp: GriddedCayleyPerm
     ) -> Iterable[GriddedCayleyPerm]:
         """
-        Return the preimages of a gridded Cayley permutation with repect to the map.
+        Return the preimages of a gridded Cayley permutation with respect to the map.
         """
         for cols, rows in product(self.product_of_cols(gcp), self.product_of_rows(gcp)):
             new_positions = tuple(zip(cols, rows))
@@ -158,7 +158,7 @@ class RowColMap:
         return keys
 
     def subset_of_map(self, col_values, row_values):
-        '''restricts row/col map to only the col_values and row_values of the preimage'''
+        """restricts row/col map to only the col_values and row_values of the preimage"""
         new_col_map, new_row_map = dict(), dict()
         for index in col_values:
             new_col_map[index] = self.col_map[index]

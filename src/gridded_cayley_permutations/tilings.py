@@ -79,6 +79,13 @@ class Tiling(CombinatorialClass):
                 return False
         return True
 
+    def gcp_in_tiling(self, gcp: GriddedCayleyPerm) -> bool:
+        return (
+            self.satisfies_obstructions(gcp)
+            and self.satisfies_requirements(gcp)
+            and all(cell < self.dimensions for cell in gcp.positions)
+        )
+
     def active_cells(self):
         """Returns the set of active cells in the tiling.
         (Cells are active if they do not contain a point obstruction.)"""
