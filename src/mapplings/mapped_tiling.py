@@ -1,18 +1,16 @@
 from typing import Iterable, Iterator, Tuple, List, Dict, DefaultDict
 from collections import defaultdict
-from copy import copy
-from itertools import product
-from math import factorial
 from comb_spec_searcher import CombinatorialClass
-from .factors import Factors
+from gridded_cayley_permutations import Factors
+
 
 from cayley_permutations import CayleyPermutation
-from .row_col_map import RowColMap
-from .gridded_cayley_perms import GriddedCayleyPerm
-from .simplify_obstructions_and_requirements import SimplifyObstructionsAndRequirements
-from .minimal_gridded_cperms import MinimalGriddedCayleyPerm
-from .tilings import Tiling
-from .point_placements import PointPlacement
+from gridded_cayley_permutations import (
+    RowColMap,
+    GriddedCayleyPerm,
+    Tiling,
+    PointPlacement,
+)
 
 Objects = DefaultDict[Tuple[int, ...], List[GriddedCayleyPerm]]
 

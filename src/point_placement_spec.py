@@ -2,7 +2,7 @@ from tilescope_folder import TileScope, TileScopePack
 from comb_spec_searcher.rule_db import RuleDBForest
 from gridded_cayley_permutations import Tiling, GriddedCayleyPerm
 from cayley_permutations import CayleyPermutation
-from gridded_cayley_permutations.mapped_tiling import Parameter, MappedTiling
+from mapplings.mapped_tiling import Parameter, MappedTiling
 from gridded_cayley_permutations.row_col_map import RowColMap
 
 
