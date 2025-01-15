@@ -1,4 +1,5 @@
 from typing import Iterable, Iterator, Tuple, List, Dict, DefaultDict
+from itertools import chain
 from collections import defaultdict
 from comb_spec_searcher import CombinatorialClass
 from gridded_cayley_permutations import Factors
@@ -73,6 +74,10 @@ class Parameter:
         for index in row_preimages:
             del new_row_map[index]
         return RowColMap(new_col_map, new_row_map).standardise_map()
+
+    def sub_parameter(self, factor):
+        preimage_of_cells = self.map.preimage_of_cells(factor)
+        return Parameter(self.ghost.sub_tiling(preimage_of_cells), self.map)
 
     def __repr__(self):
         return str((repr(self.ghost), str(self.map)))
@@ -322,12 +327,23 @@ class MappedTiling(CombinatorialClass):
             new_parameters.append(Parameter(new_parameter, new_map))
         return new_parameters
 
-    def find_factors(self):
-        """Update for different types of parameters and fix so doesn't split up parameters"""
-        for parameter in self.parameters:
-            t_factors = Factors(self.tiling).find_factors_tracked()
+    def all_parameters(self):
+        """Returns a list of all parameters."""
+        return (
+            self.avoiding_parameters
+            + list(chain.from_iterable(self.containing_parameters))
+            + list(chain.from_iterable(self.enumeration_parameters))
+        )
+
+    def find_factor_cells(self):
+        """Returns a partition of the cells so that the mapped tiling is factored."""
+        parameters = self.all_parameters()
+        all_factors = Factors(self.tiling).find_factors_tracked()
+        for parameter in parameters:
+            t_factors = all_factors
+            print(all_factors)
             p_factors = Factors(parameter.ghost).find_factors_tracked()
-            all_factors = []  # list of tuple pairs, t_cells and p_cells
+            all_factors = []
             queue = t_factors
             while queue:
                 t_factor = queue.pop()
@@ -353,16 +369,36 @@ class MappedTiling(CombinatorialClass):
                         break
                     for T in new_t_factors:
                         final_t_factor += T
-                all_factors.append((final_t_factor, final_p_factors))
-            for factor in all_factors:
-                factor_tiling = self.tiling.sub_tiling(factor[0])
-                factor_ghost = parameter.ghost.sub_tiling(factor[1])
-                factor_map = parameter.map
-                yield (
-                    MappedTiling(
-                        factor_tiling, [Parameter(factor_ghost, factor_map)]
-                    ).remove_empty_rows_and_columns()
-                )
+                print(final_t_factor)
+                all_factors.append(final_t_factor)
+        return all_factors
+
+    def is_factorable(self) -> bool:
+        """Returns True if the mapped tiling is factorable."""
+        factors = self.find_factor_cells()
+        for factor in factors:
+            pass
+
+    def find_factors(self):
+        for factor in self.find_factor_cells():
+            factor_tiling = self.tiling.sub_tiling(factor)
+            factor_avoiding_parameters = []
+            for avoiding_param in self.avoiding_parameters:
+                factor_avoiding_parameters.append(avoiding_param.sub_parameter(factor))
+            factor_containing_parameters = [
+                [contain_param.sub_parameter(factor) for contain_param in param_list]
+                for param_list in self.containing_parameters
+            ]
+            factor_enumeration_parameters = [
+                [enum_param.sub_parameter(factor) for enum_param in param_list]
+                for param_list in self.enumeration_parameters
+            ]
+            yield MappedTiling(
+                factor_tiling,
+                factor_avoiding_parameters,
+                factor_containing_parameters,
+                factor_enumeration_parameters,
+            ).remove_empty_rows_and_columns()
 
     @staticmethod
     def map_p_factor_to_t_factor(p_factor, parameter, t_factors):

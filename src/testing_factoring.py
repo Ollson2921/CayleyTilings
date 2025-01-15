@@ -37,11 +37,14 @@ ghost_tiling = Tiling(
 
 # print(ghost_tiling)
 
+P3 = Parameter(base_tiling, RowColMap({0: 0, 1: 1, 2: 2}, {0: 0, 1: 1}))
+
 P1 = Parameter(
     ghost_tiling.add_obstructions(
         [
             # GriddedCayleyPerm(CayleyPermutation([0]), ((0, 1),)),
             GriddedCayleyPerm(CayleyPermutation([0]), ((1, 0),)),
+            # GriddedCayleyPerm(CayleyPermutation([0]), ((0, 1),)),
             GriddedCayleyPerm(CayleyPermutation([0]), ((2, 0),)),
             GriddedCayleyPerm(CayleyPermutation([0]), ((3, 0),)),
         ]
@@ -52,6 +55,7 @@ P2 = Parameter(
     ghost_tiling.add_obstructions(
         [
             GriddedCayleyPerm(CayleyPermutation([0]), ((0, 1),)),
+            GriddedCayleyPerm(CayleyPermutation([0]), ((1, 0),)),
             # GriddedCayleyPerm(CayleyPermutation([0]), ((1, 1),)),
             GriddedCayleyPerm(CayleyPermutation([0]), ((2, 0),)),
             GriddedCayleyPerm(CayleyPermutation([0]), ((3, 0),)),
@@ -61,11 +65,14 @@ P2 = Parameter(
 )
 
 
-M = MappedTiling(base_tiling, [P1, P2])
-M = MappedTiling(base_tiling, [P2, P1])
-M.reap_contradictory_ghosts()
+M = MappedTiling(base_tiling, [P1, P2], [], [])
+# M = MappedTiling(base_tiling, [P2, P1], [], [])
+M = MappedTiling(base_tiling, [P3], [], [])
+# M.reap_contradictory_ghosts()
 print(M)
-# print("FACTORS:")
-# for factor in M.find_factors():
-#     print("-------------------------------------")
-#     print(factor)
+print("FACTORS:")
+for factor in M.find_factors():
+    print("-------------------------------------")
+    print(factor)
+    # print(base_tiling.sub_tiling(factor))
+# print(M.find_factors())

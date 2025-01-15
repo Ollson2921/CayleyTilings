@@ -48,17 +48,20 @@ mappling = MappedTiling(
     [],
 )
 
-new_mappling = mappling.point_placement((0, 0), 0)
-print(new_mappling)
+print(mappling)
+# new_mappling = mappling.point_placement((0, 0), 0)
+# print(new_mappling)
 
 # print(mappling)
-for i in range(10):
-    print(mappling.get_terms(i))
-    # for gcp in mappling.get_objects(i)[tuple()]:
-    #     print(gcp.pattern)
+# for i in range(10):
+#     print(mappling.get_terms(i))
+# for gcp in mappling.get_objects(i)[tuple()]:
+#     print(gcp.pattern)
 
 # gcp = GriddedCayleyPerm(
 #     CayleyPermutation((2, 0, 1, 3)), [(0, 0), (0, 0), (0, 0), (0, 0)]
 # )
 # for preimage in avoiding_parameters[0].preimage_of_gcp(gcp):
 #     print(preimage)
+
+print(mappling.find_factors())

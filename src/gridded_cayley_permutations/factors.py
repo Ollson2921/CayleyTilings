@@ -67,6 +67,7 @@ class Factors:
         return tuple(self.tiling.sub_tiling(factor) for factor in factors)
 
     def find_factors_tracked(self):
+        """Returns a partition of the cells that is the factors."""
         self.combine_cells_in_row_or_col()
         self.combine_cells_in_obs_and_reqs()
         factors = []
