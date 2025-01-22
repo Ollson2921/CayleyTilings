@@ -321,7 +321,7 @@ class Tiling(CombinatorialClass):
     ## Construction methods
     @staticmethod
     def from_vincular(cperm :CayleyPermutation, adjacencies :Iterable[int]):
-        '''Both cperm and adjacencies must be 0 based.Creates a tiling from a vincular pattern. Adjacencies is a list of positions where i in adjacencencies means positions i and i+1 must be adjacent'''
+        '''Both cperm and adjacencies must be 0 based. Creates a tiling from a vincular pattern. Adjacencies is a list of positions where i in adjacencencies means positions i and i+1 must be adjacent'''
         dimensions = (len(cperm), max(cperm)+1)
         all_obs, all_reqs = [], []
         perm_cells = [(2*k+1,2*cperm[k]+1) for k in range(dimensions[0])]

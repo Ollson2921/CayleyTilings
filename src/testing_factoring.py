@@ -1,6 +1,6 @@
 from gridded_cayley_permutations import Tiling, GriddedCayleyPerm
 from cayley_permutations import CayleyPermutation
-from mapplings import Parameter, MappedTiling
+from mapplings import Parameter, MappedTiling, MTFactor
 from gridded_cayley_permutations.row_col_map import RowColMap
 
 base_obs = [
@@ -71,7 +71,7 @@ M = MappedTiling(base_tiling, [P3], [], [])
 # M.reap_contradictory_ghosts()
 print(M)
 print("FACTORS:")
-for factor in M.find_factors():
+for factor in MTFactor(M).find_factors():
     print("-------------------------------------")
     print(factor)
     # print(base_tiling.sub_tiling(factor))
