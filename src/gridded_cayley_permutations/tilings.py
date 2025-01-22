@@ -317,6 +317,32 @@ class Tiling(CombinatorialClass):
                     return False
                 ob_list.remove(shift)
         return True
+    
+    ## Construction methods
+    @staticmethod
+    def from_vincular(cperm :CayleyPermutation, adjacencies :Iterable[int]):
+        '''Creates a tiling from a vincular pattern. Adjacencies is a list of positions where i in adjacencencies means positions i and i+1 must be adjacent'''
+        n, perm_cells = len(cperm), perm_cells=[(2*k+1,2*cperm[k]+1) for k in range(n)]
+        all_obs, all_reqs = [], []
+        for i in range(n):
+            for j in range(2*n+1):
+                v_cell = (2*i+1,j)
+                h_cell = (j,2*i+1)
+                all_obs.append(GriddedCayleyPerm(CayleyPermutation([0,1]), [h_cell,h_cell]))
+                all_obs.append(GriddedCayleyPerm(CayleyPermutation([1,0]), [h_cell,h_cell]))
+                if v_cell not in perm_cells:
+                    all_obs.append(GriddedCayleyPerm(CayleyPermutation([0]), [v_cell]))
+            all_reqs.append([GriddedCayleyPerm(CayleyPermutation([0]), [perm_cells[i]])])
+        for i in adjacencies:
+            for j in range(2*n+1):
+                all_obs.append(GriddedCayleyPerm(CayleyPermutation([0]), [(2*i+2,j)]))
+        print(all_obs)
+        return Tiling(all_obs,all_reqs,(2*n+1,2*n+1))
+
+
+
+
+
 
     ### CSS methods
 
