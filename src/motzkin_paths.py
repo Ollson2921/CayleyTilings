@@ -51,7 +51,7 @@ mappling = MappedTiling(
 print(mappling)
 
 
-print(Tiling.from_vincular(CayleyPermutation((0,2,1)), (1,)))
+print(Tiling.from_vincular(CayleyPermutation((0,0,0)), (1,)))
 # new_mappling = mappling.point_placement((0, 0), 0)
 # print(new_mappling)
 
