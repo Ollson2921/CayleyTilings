@@ -100,12 +100,12 @@ class MappedTiling(CombinatorialClass):
         self.containing_parameters = containing_parameters
         self.enumeration_parameters = enumeration_parameters
 
-    def objects_of_size(self, n, **parameters): #Good
+    def objects_of_size(self, n, **parameters):  # Good
         for val in self.get_objects(n).values():
             for gcp in val:
                 yield gcp
 
-    def get_objects(self, n: int) -> Objects: #Good
+    def get_objects(self, n: int) -> Objects:  # Good
         objects = defaultdict(list)
         for gcp in self.tiling.objects_of_size(n):
             if self.gcp_in_tiling(gcp):
@@ -113,7 +113,7 @@ class MappedTiling(CombinatorialClass):
                 objects[param].append(gcp)
         return objects
 
-    def get_parameters(self, gcp: GriddedCayleyPerm) -> Tuple[int, ...]: #Good
+    def get_parameters(self, gcp: GriddedCayleyPerm) -> Tuple[int, ...]:  # Good
         """Parameters are not what you think!!! This is specific to combinatorical class parameters"""
         all_lists = []
         for param_list in self.enumeration_parameters:
@@ -122,34 +122,34 @@ class MappedTiling(CombinatorialClass):
             )
         return tuple(all_lists)
 
-    def gcp_in_tiling(self, gcp: GriddedCayleyPerm) -> bool: #Good
+    def gcp_in_tiling(self, gcp: GriddedCayleyPerm) -> bool:  # Good
         """Returns True if the gridded cayley permutation is in the tiling"""
         return self.gcp_satisfies_containing_params(
             gcp
         ) and self.gcp_satisfies_avoiding_params(gcp)
 
-    def gcp_satisfies_avoiding_params(self, gcp: GriddedCayleyPerm) -> bool: #Good
+    def gcp_satisfies_avoiding_params(self, gcp: GriddedCayleyPerm) -> bool:  # Good
         """Returns True if the gridded cayley permutation satisfies the avoiding parameters"""
         return not any(
             any(True for _ in param.preimage_of_gcp(gcp))
             for param in self.avoiding_parameters
         )
 
-    def gcp_satisfies_containing_params(self, gcp: GriddedCayleyPerm) -> bool: #Good
+    def gcp_satisfies_containing_params(self, gcp: GriddedCayleyPerm) -> bool:  # Good
         """Returns True if the gridded cayley permutation satisfies the containing parameters"""
         return all(
             any(any(True for _ in param.preimage_of_gcp(gcp)) for param in params)
             for params in self.containing_parameters
         )
 
-    def reap_contradictory_ghosts(self): #BAD
+    def reap_contradictory_ghosts(self):  # BAD
         """Removes parameters which are contradictory"""
         for n in range(len(self.parameters)):
             ghost = self.parameters[n]
             if ghost.is_contradictory(self.tiling):
                 self.kill_ghost(n)
 
-    def kill_ghost(self, ghost_number: int): #BAD
+    def kill_ghost(self, ghost_number: int):  # BAD
         """removes a ghost from the mapped tiling"""
         new_ghost = self.parameters.pop(ghost_number)
         for i in range(new_ghost.ghost.dimensions[0]):
@@ -159,28 +159,32 @@ class MappedTiling(CombinatorialClass):
                 )
         self.parameters.append(new_ghost)
 
-    def is_trivial(self,confidence = 8): #TODO: Make this better and based on theory
-        return set(self.objects_of_size(confidence))==set(self.tiling.objects_of_size(confidence))
-    
-    def is_contradictory(self,confidence = 8): #TODO: Make this better and based on theory and correct
+    def is_trivial(self, confidence=8):  # TODO: Make this better and based on theory
+        return set(self.objects_of_size(confidence)) == set(
+            self.tiling.objects_of_size(confidence)
+        )
+
+    def is_contradictory(
+        self, confidence=8
+    ):  # TODO: Make this better and based on theory and correct
         return len(set(self.objects_of_size(confidence))) == 0
 
-    def pop_parameter(self, parameter_index=0): #BAD
+    def pop_parameter(self, parameter_index=0):  # BAD
         """removes the parameter at an index and creates a new mapped tiling"""
         param = self.parameters.pop(parameter_index)
         return MappedTiling(self.tiling, [param])
 
-    def pop_all_parameters(self): #BAD
+    def pop_all_parameters(self):  # BAD
         """yields all mapped tilings with a single parameter"""
         while len(self.parameters) > 0:
             yield self.pop_parameter()
 
-    def add_parameter(self, parameter: Parameter): #BAD
+    def add_parameter(self, parameter: Parameter):  # BAD
         self.parameters.append(parameter)
 
     def add_obs_to_param_list(
         self, parameters: List[Parameter], obs: List[GriddedCayleyPerm]
-    ): #Good
+    ):  # Good
         """Adds obstructions to a list of parameters and returns the new list"""
         new_parameters = []
         for parameter in parameters:
@@ -190,7 +194,7 @@ class MappedTiling(CombinatorialClass):
             new_parameters.append(Parameter(new_parameter, parameter.map))
         return new_parameters
 
-    def add_obstructions(self, obstructions: List[GriddedCayleyPerm]): #Good
+    def add_obstructions(self, obstructions: List[GriddedCayleyPerm]):  # Good
         """Adds obstructions to the tiling (and corrects the parameters)"""
         new_containing_parameters = []
         for parameter_list in self.containing_parameters:
@@ -211,7 +215,7 @@ class MappedTiling(CombinatorialClass):
 
     def add_reqs_to_param_list(
         self, parameters: List[Parameter], reqs: List[List[GriddedCayleyPerm]]
-    ): #Good
+    ):  # Good
         """Adds requirements to a list of parameters and returns the new list"""
         new_parameters = []
         for parameter in parameters:
@@ -221,8 +225,9 @@ class MappedTiling(CombinatorialClass):
             new_parameters.append(Parameter(new_parameter, parameter.map))
         return new_parameters
 
-    def add_requirements(self, requirements: List[List[GriddedCayleyPerm]]): #Good
-        """Adds requirements to the tiling (and corrects the parameters)."""
+    def add_requirements(self, requirements: List[List[GriddedCayleyPerm]]):  # Good
+        """Adds requirements to the mappling by adding them to each of the
+        parameters in all possible ways."""
         new_containing_parameters = []
         for parameter_list in self.containing_parameters:
             new_containing_parameters.append(
@@ -241,53 +246,7 @@ class MappedTiling(CombinatorialClass):
             new_enumeration_parameters,
         )
 
-    def point_placement(self, cell: Tuple[int, int], direction: int) -> "MappedTiling": #Good
-        """Returns the point placement of a cell in a direction"""
-        point = [GriddedCayleyPerm(CayleyPermutation([0]), [cell])]
-        indices = (0,)
-        new_tiling = PointPlacement(self.tiling).point_placement(
-            point, indices, direction
-        )[0]
-        new_continaing_parameters = []
-        for parameter_list in self.containing_parameters:
-            new_continaing_parameters.append(
-                self.add_point_to_param_list(
-                    parameter_list, point, indices, direction, cell
-                )
-            )
-        new_enumeration_parameters = []
-        for parameter_list in self.enumeration_parameters:
-            new_enumeration_parameters.append(
-                self.add_point_to_param_list(parameter_list, indices, direction, cell)
-            )
-        return MappedTiling(
-            new_tiling,
-            self.add_point_to_param_list(
-                self.avoiding_parameters, indices, direction, cell
-            ),
-            new_continaing_parameters,
-            new_enumeration_parameters,
-        )
-
-    def add_point_to_param_list(
-        self, parameters: List[Parameter], indices, direction, cell
-    ): #Good
-        """Adds a point to a list of parameters in the cell and direction
-        it is being added in the base tiling and returns the new list"""
-        new_parameters = []
-        for parameter in parameters:
-            for preimage_cell in parameter.map.preimage_of_cell(cell):
-                point = [GriddedCayleyPerm(CayleyPermutation([0]), [preimage_cell])]
-                new_param = PointPlacement(parameter.ghost).point_placement(
-                    point, indices, direction
-                )[0]
-                new_map = parameter.expand_row_col_map_at_index(
-                    2, 2, preimage_cell[0], preimage_cell[1]
-                )
-                new_parameters.append(Parameter(new_param, new_map))
-        return new_parameters
-
-    def remove_empty_rows_and_columns(self): #Good
+    def remove_empty_rows_and_columns(self):  # Good
         """Finds and removes empty rows and cols in the base tiling then removes the
         corresponding rows and columns in the parameters"""
         empty_cols, empty_rows = self.tiling.find_empty_rows_and_columns()
@@ -318,7 +277,7 @@ class MappedTiling(CombinatorialClass):
 
     def remove_empty_rows_and_cols_from_param_list(
         self, parameters, empty_cols, empty_rows
-    ): #Good
+    ):  # Good
         """Removes the rows and cols from each ghost in the parameter list then
         returns new parameter list."""
         new_parameters = []
@@ -333,7 +292,7 @@ class MappedTiling(CombinatorialClass):
             new_parameters.append(Parameter(new_parameter, new_map))
         return new_parameters
 
-    def all_parameters(self): #Good
+    def all_parameters(self):  # Good
         """Returns a list of all parameters."""
         return (
             self.avoiding_parameters
@@ -385,11 +344,16 @@ class MappedTiling(CombinatorialClass):
 
     def __str__(self) -> str:
         return (
-            str(self.tiling)
+            "Base tiling: \n"
+            + str(self.tiling)
             + "\nAvoiding parameters:\n"
             + "\n".join([str(p) for p in self.avoiding_parameters])
             + "\nContaining parameters:\n"
-            + "\n".join([str(p) for p in self.containing_parameters])
+            + "\nNew containing parameters list \n".join(
+                ["\n".join([str(p) for p in ps]) for ps in self.containing_parameters]
+            )
             + "\nEnumeration parameters:\n"
-            + "\n".join([str(p) for p in self.enumeration_parameters])
+            + "\nNew enumeration parameters list\n".join(
+                ["\n".join([str(p) for p in ps]) for ps in self.enumeration_parameters]
+            )
         )

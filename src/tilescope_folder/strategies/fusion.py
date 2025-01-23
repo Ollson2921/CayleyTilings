@@ -46,7 +46,6 @@ class FusionStrategy(Strategy[Tiling, GriddedCayleyPerm]):
     #     return children
 
     def decomposition_function(self, tiling: Tiling) -> Tiling:
-        print("Doing fusion!")
         # if tiling.is_fuseable(self.direction, self.index):
         return (tiling.fuse(self.direction, self.index),)
         # raise AttributeError("Trying to fuse a tiling that does not fuse")

@@ -44,14 +44,14 @@ mappling = MappedTiling(
         (1, 1),
     ),
     avoiding_parameters,
-    [],
-    [],
+    [[]],
+    [[]],
 )
 
 print(mappling)
 
 
-print(Tiling.from_vincular(CayleyPermutation((0,0,0)), (1,)))
+# print(Tiling.from_vincular(CayleyPermutation((0, 1, 0)), (0,)))
 # new_mappling = mappling.point_placement((0, 0), 0)
 # print(new_mappling)
 
@@ -67,4 +67,4 @@ print(Tiling.from_vincular(CayleyPermutation((0,0,0)), (1,)))
 # for preimage in avoiding_parameters[0].preimage_of_gcp(gcp):
 #     print(preimage)
 
-#print(mappling.find_factors())
+# print(mappling.find_factors())

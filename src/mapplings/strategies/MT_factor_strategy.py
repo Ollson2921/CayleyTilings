@@ -1,4 +1,4 @@
-"""Factors the tiling into sections that are independent of each other."""
+"""Factors the mappling into sections that are independent of each other."""
 
 from typing import Dict, Iterator, Optional, Tuple
 from comb_spec_searcher import CartesianProductStrategy, Strategy
@@ -23,13 +23,17 @@ class AbstractFactorStrategy:
             ignore_parent=ignore_parent, workable=workable, inferrable=True
         )
 
-    def decomposition_function(self, comb_class: Tiling) -> Tuple[Tiling, ...]:
+    def decomposition_function(
+        self, comb_class: MappedTiling
+    ) -> Tuple[MappedTiling, ...]:
         if not MTFactor(comb_class).is_factorable():
             raise StrategyDoesNotApply
         return MTFactor(comb_class).find_factors()
 
     def extra_parameters(
-        self, comb_class: Tiling, children: Optional[Tuple[Tiling, ...]] = None
+        self,
+        comb_class: MappedTiling,
+        children: Optional[Tuple[MappedTiling, ...]] = None,
     ) -> Tuple[Dict[str, str], ...]:
         if children is None:
             children = self.decomposition_function(comb_class)
@@ -39,15 +43,15 @@ class AbstractFactorStrategy:
 
     def formal_step(self) -> str:
         """
-        Return a string that describe the operation performed on the tiling.
+        Return a string that describe the operation performed on the mappling.
         """
-        return "Factor the tiling into factors"
+        return "Factor the mappling into factors"
 
     def backward_map(
         self,
-        comb_class: Tiling,
+        comb_class: MappedTiling,
         objs: Tuple[Optional[GriddedCayleyPerm], ...],
-        children: Optional[Tuple[Tiling, ...]] = None,
+        children: Optional[Tuple[MappedTiling, ...]] = None,
     ) -> Iterator[GriddedCayleyPerm]:
         if children is None:
             children = self.decomposition_function(comb_class)
@@ -55,9 +59,9 @@ class AbstractFactorStrategy:
 
     def forward_map(
         self,
-        comb_class: Tiling,
+        comb_class: MappedTiling,
         obj: GriddedCayleyPerm,
-        children: Optional[Tuple[Tiling, ...]] = None,
+        children: Optional[Tuple[MappedTiling, ...]] = None,
     ) -> Tuple[GriddedCayleyPerm, ...]:
         if children is None:
             children = self.decomposition_function(comb_class)
@@ -88,44 +92,49 @@ class AbstractFactorStrategy:
 
 
 class FactorStrategy(
-    AbstractFactorStrategy, CartesianProductStrategy[Tiling, GriddedCayleyPerm]
+    AbstractFactorStrategy, CartesianProductStrategy[MappedTiling, GriddedCayleyPerm]
 ):
     pass
 
 
-class ShuffleFactorStrategy(
-    AbstractFactorStrategy, Strategy[Tiling, GriddedCayleyPerm]
-):
-    def decomposition_function(self, comb_class: Tiling) -> Tuple[Tiling, ...]:
-        if 1 not in comb_class.dimensions:
-            raise StrategyDoesNotApply(
-                "Tiling is not a row or column shuffle of factors."
-            )
-        # TODO: raise StrategyDoesNotApply if no factors.
-        return ShuffleFactors(comb_class).find_factors()
+# class ShuffleFactorStrategy(
+#     AbstractFactorStrategy, Strategy[MappedTiling, GriddedCayleyPerm]
+# ):
+#     def decomposition_function(
+#         self, comb_class: MappedTiling
+#     ) -> Tuple[MappedTiling, ...]:
+#         if 1 not in comb_class.dimensions:
+#             raise StrategyDoesNotApply(
+#                 "MappedTiling is not a row or column shuffle of factors."
+#             )
+#         # TODO: raise StrategyDoesNotApply if no factors.
+#         return ShuffleFactors(comb_class).find_factors()
 
-    def constructor(
-        self, comb_class: Tiling, children: Tuple[Tiling, ...] | None = None
-    ) -> Constructor:
-        return DummyConstructor()
+#     def constructor(
+#         self, comb_class: MappedTiling, children: Tuple[MappedTiling, ...] | None = None
+#     ) -> Constructor:
+#         return DummyConstructor()
 
-    def can_be_equivalent(self) -> bool:
-        return True
+#     def can_be_equivalent(self) -> bool:
+#         return True
 
-    def is_reversible(self, comb_class: Tiling) -> bool:
-        return False
+#     def is_reversible(self, comb_class: MappedTiling) -> bool:
+#         return False
 
-    def is_two_way(self, comb_class: Tiling) -> bool:
-        return False
+#     def is_two_way(self, comb_class: MappedTiling) -> bool:
+#         return False
 
-    def reverse_constructor(
-        self, idx: int, comb_class: Tiling, children: Tuple[Tiling, ...] | None = None
-    ) -> Constructor:
-        raise NotImplementedError
+#     def reverse_constructor(
+#         self,
+#         idx: int,
+#         comb_class: MappedTiling,
+#         children: Tuple[MappedTiling, ...] | None = None,
+#     ) -> Constructor:
+#         raise NotImplementedError
 
-    def shifts(
-        self, comb_class: Tiling, children: Tuple[Tiling, ...] | None
-    ) -> Tuple[int, ...]:
-        min_sizes = tuple(child.minimum_size_of_object() for child in children)
-        point_sum = sum(min_sizes)
-        return tuple(point_sum - min_size for min_size in min_sizes)
+#     def shifts(
+#         self, comb_class: MappedTiling, children: Tuple[MappedTiling, ...] | None
+#     ) -> Tuple[int, ...]:
+#         min_sizes = tuple(child.minimum_size_of_object() for child in children)
+#         point_sum = sum(min_sizes)
+#         return tuple(point_sum - min_size for min_size in min_sizes)

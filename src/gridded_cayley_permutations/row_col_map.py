@@ -16,8 +16,8 @@ class RowColMap:
     """
 
     def __init__(self, col_map: Dict[int, int], row_map: Dict[int, int]):
-        self.row_map = row_map
-        self.col_map = col_map
+        self.row_map = dict(sorted(row_map.items(), key=lambda item: item[1]))
+        self.col_map = dict(sorted(col_map.items(), key=lambda item: item[1]))
 
     def map_gridded_cperm(self, gcp: GriddedCayleyPerm) -> GriddedCayleyPerm:
         """

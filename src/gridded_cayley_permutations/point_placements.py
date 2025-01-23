@@ -176,7 +176,7 @@ class PointPlacement:
         indices: Tuple[int, ...],
         direction: int,
         cell: Tuple[int, int],
-    ) -> Tuple[Tiling, ...]:
+    ) -> Tiling:
         multiplex_map = self.multiplex_map(cell)
         multiplex_obs, multiplex_reqs = multiplex_map.preimage_of_tiling(self.tiling)
         point_obs, point_reqs = self.point_obstructions_and_requirements(
