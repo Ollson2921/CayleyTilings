@@ -2,7 +2,6 @@ from typing import Iterable, Iterator, Tuple, List, Dict, DefaultDict
 from itertools import chain
 from collections import defaultdict
 from comb_spec_searcher import CombinatorialClass
-from gridded_cayley_permutations import Factors
 
 
 from cayley_permutations import CayleyPermutation
@@ -163,6 +162,14 @@ class MappedTiling(CombinatorialClass):
         return set(self.objects_of_size(confidence)) == set(
             self.tiling.objects_of_size(confidence)
         )
+    
+    def avoiders_are_trivial(self):
+        obstructions,requirements=[],[]
+        for param in self.avoiding_parameters:
+            obstructions+= param.map.map_gridded_cperms(param.ghost.obstructions)
+            requirements+= (param.map.map_gridded_cperms(req) for req in param.ghost.requirements)
+        return self.tiling == Tiling(obstructions,requirements,self.tiling.dimensions)
+
 
     def is_contradictory(
         self, confidence=8

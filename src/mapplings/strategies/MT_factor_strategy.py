@@ -26,9 +26,10 @@ class AbstractFactorStrategy:
     def decomposition_function(
         self, comb_class: MappedTiling
     ) -> Tuple[MappedTiling, ...]:
-        if not MTFactor(comb_class).is_factorable():
+        factor_cells = MTFactor(comb_class).find_factor_cells()
+        if not MTFactor(comb_class).is_factorable(factor_cells):
             raise StrategyDoesNotApply
-        return MTFactor(comb_class).find_factors()
+        return MTFactor(comb_class).make_factors(factor_cells)
 
     def extra_parameters(
         self,
