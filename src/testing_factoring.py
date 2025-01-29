@@ -71,8 +71,11 @@ M = MappedTiling(base_tiling, [P3], [], [])
 # M.reap_contradictory_ghosts()
 print(M)
 print("FACTORS:")
+
 for factor in MTFactor(M).find_factors():
     print("-------------------------------------")
     print(factor)
     # print(base_tiling.sub_tiling(factor))
 # print(M.find_factors())
+
+print(MTFactor(M).is_factorable2(MTFactor(M).find_factor_cells()))
