@@ -9,8 +9,6 @@
 from typing import Dict, Iterable, Iterator, Optional, Tuple
 from comb_spec_searcher import DisjointUnionStrategy, StrategyFactory
 from gridded_cayley_permutations.point_placements import (
-    PointPlacement,
-    PartialPointPlacements,
     Directions,
     Right_bot,
     Left,
@@ -22,12 +20,12 @@ from gridded_cayley_permutations.point_placements import (
 from gridded_cayley_permutations import GriddedCayleyPerm
 from cayley_permutations import CayleyPermutation
 from mapped_tiling import MappedTiling
-from MT_point_placement import MTRequirementPlacement
+from MT_point_placement import MTRequirementPlacement, MTPartialPointPlacements
 
 Cell = Tuple[int, int]
 
 
-class RequirementPlacementStrategy(
+class MTRequirementPlacementStrategy(
     DisjointUnionStrategy[MappedTiling, GriddedCayleyPerm]
 ):
     """Places the requirements in gcps at the indices in the direction given in the mappling."""
@@ -95,7 +93,7 @@ class RequirementPlacementStrategy(
 
     def __repr__(self) -> str:
         return (
-            f"RequirementPlacementStrategy(gcps={self.gcps}, "
+            f"MTRequirementPlacementStrategy(gcps={self.gcps}, "
             f"indices={self.indices}, direction={self.direction}, "
             f"ignore_parent={self.ignore_parent})"
         )
@@ -112,27 +110,29 @@ class RequirementPlacementStrategy(
         return d
 
     @classmethod
-    def from_dict(cls, d: dict) -> "RequirementPlacementStrategy":
+    def from_dict(cls, d: dict) -> "MTRequirementPlacementStrategy":
         gcps = tuple(GriddedCayleyPerm.from_dict(gcp) for gcp in d.pop("gcps"))
         return cls(gcps=gcps, **d)
 
 
-class PointPlacementFactory(StrategyFactory[MappedTiling]):
+class MTPointPlacementFactory(StrategyFactory[MappedTiling]):
     def __call__(
         self, comb_class: MappedTiling
-    ) -> Iterator[RequirementPlacementStrategy]:
+    ) -> Iterator[MTRequirementPlacementStrategy]:
         """Factory to place a point requirement in a mappling in extreme directions
         in each positive cell of the base tiling."""
         for cell in comb_class.tiling.positive_cells():
             for direction in Directions:
                 gcps = (GriddedCayleyPerm(CayleyPermutation([0]), [cell]),)
                 indices = (0,)
-                yield RequirementPlacementStrategy(gcps, indices, direction)
-                if direction in PartialRequirementPlacementStrategy.DIRECTIONS:
-                    yield PartialRequirementPlacementStrategy(gcps, indices, direction)
+                yield MTRequirementPlacementStrategy(gcps, indices, direction)
+                if direction in MTPartialRequirementPlacementStrategy.DIRECTIONS:
+                    yield MTPartialRequirementPlacementStrategy(
+                        gcps, indices, direction
+                    )
 
     @classmethod
-    def from_dict(cls, d: dict) -> "PointPlacementFactory":
+    def from_dict(cls, d: dict) -> "MTPointPlacementFactory":
         return cls(**d)
 
     def __repr__(self) -> str:
@@ -142,11 +142,11 @@ class PointPlacementFactory(StrategyFactory[MappedTiling]):
         return "Point placement"
 
 
-class PartialRequirementPlacementStrategy(RequirementPlacementStrategy):
+class MTPartialRequirementPlacementStrategy(MTRequirementPlacementStrategy):
     DIRECTIONS = [Left, Right]
 
-    def algorithm(self, mappling: MappedTiling) -> PointPlacement:
-        return PartialPointPlacements(mappling)  # TODO: Implement this
+    def algorithm(self, mappling: MappedTiling) -> MTPartialPointPlacements:
+        return MTPartialPointPlacements(mappling)  # TODO: Implement this
 
     def formal_step(self):
         return f"Partially placed the point of the requirement {self.gcps} at indices {self.indices} in direction {self.direction}"
@@ -155,7 +155,7 @@ class PartialRequirementPlacementStrategy(RequirementPlacementStrategy):
 class RowInsertionFactory(StrategyFactory[MappedTiling]):
     def __call__(
         self, comb_class: MappedTiling
-    ) -> Iterator[RequirementPlacementStrategy]:
+    ) -> Iterator[MTRequirementPlacementStrategy]:
         not_point_rows = (
             set(range(comb_class.tiling.dimensions[1])) - comb_class.tiling.point_rows()
         )
@@ -167,7 +167,7 @@ class RowInsertionFactory(StrategyFactory[MappedTiling]):
                 all_gcps.append(gcps)
             indices = tuple(0 for _ in all_gcps)
             for direction in [Left_bot, Right_bot, Left_top, Right_top]:
-                yield RequirementPlacementStrategy(all_gcps, indices, direction)
+                yield MTRequirementPlacementStrategy(all_gcps, indices, direction)
 
     @classmethod
     def from_dict(cls, d: dict) -> "RowInsertionFactory":
@@ -183,7 +183,7 @@ class RowInsertionFactory(StrategyFactory[MappedTiling]):
 class ColInsertionFactory(StrategyFactory[MappedTiling]):
     def __call__(
         self, comb_class: MappedTiling
-    ) -> Iterator[RequirementPlacementStrategy]:
+    ) -> Iterator[MTRequirementPlacementStrategy]:
         not_point_cols = set(range(comb_class.tiling.dimensions[0])) - set(
             [cell[0] for cell in comb_class.tiling.point_cells()]
         )
@@ -195,7 +195,7 @@ class ColInsertionFactory(StrategyFactory[MappedTiling]):
                 all_gcps.append(gcps)
             indices = tuple(0 for _ in all_gcps)
             for direction in [Left, Right]:
-                yield RequirementPlacementStrategy(all_gcps, indices, direction)
+                yield MTRequirementPlacementStrategy(all_gcps, indices, direction)
 
     @classmethod
     def from_dict(cls, d: dict) -> "RowInsertionFactory":

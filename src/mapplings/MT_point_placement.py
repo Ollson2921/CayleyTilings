@@ -111,7 +111,7 @@ class MTRequirementPlacement:
         return new_requirement_list, new_indices
 
 
-class PartialPointPlacements(MTRequirementPlacement):
+class MTPartialPointPlacements(MTRequirementPlacement):
     """TODO: update for mapplings"""
 
     DIRECTIONS = [Left, Right]
