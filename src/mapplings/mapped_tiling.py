@@ -9,7 +9,6 @@ from gridded_cayley_permutations import (
     RowColMap,
     GriddedCayleyPerm,
     Tiling,
-    PointPlacement,
 )
 
 Objects = DefaultDict[Tuple[int, ...], List[GriddedCayleyPerm]]
@@ -162,14 +161,15 @@ class MappedTiling(CombinatorialClass):
         return set(self.objects_of_size(confidence)) == set(
             self.tiling.objects_of_size(confidence)
         )
-    
-    def avoiders_are_trivial(self):
-        obstructions,requirements=[],[]
-        for param in self.avoiding_parameters:
-            obstructions+= param.map.map_gridded_cperms(param.ghost.obstructions)
-            requirements+= (param.map.map_gridded_cperms(req) for req in param.ghost.requirements)
-        return self.tiling == Tiling(obstructions,requirements,self.tiling.dimensions)
 
+    def avoiders_are_trivial(self):
+        obstructions, requirements = [], []
+        for param in self.avoiding_parameters:
+            obstructions += param.map.map_gridded_cperms(param.ghost.obstructions)
+            requirements += (
+                param.map.map_gridded_cperms(req) for req in param.ghost.requirements
+            )
+        return self.tiling == Tiling(obstructions, requirements, self.tiling.dimensions)
 
     def is_contradictory(
         self, confidence=8
