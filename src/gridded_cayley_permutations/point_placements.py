@@ -158,7 +158,7 @@ class PointPlacement:
         indices: Tuple[int, ...],
         direction: int,
     ) -> Tuple[Tiling, ...]:
-        if direction not in self.DIRECTIONS:
+        if direction not in self.DIRECTIONS or direction != 6:
             raise ValueError(f"Direction {direction} is not a valid direction.")
         cells = []
         for idx, gcp in zip(indices, requirement_list):
@@ -179,9 +179,12 @@ class PointPlacement:
         multiplex_map = self.multiplex_map(cell)
         multiplex_obs, multiplex_reqs = multiplex_map.preimage_of_tiling(self.tiling)
         point_obs, point_reqs = self.point_obstructions_and_requirements(cell)
-        forced_obs = self.forced_obstructions(
-            cell, requirement_list, indices, direction
-        )
+        if direction == 6:
+            forced_obs = []
+        else:
+            forced_obs = self.forced_obstructions(
+                cell, requirement_list, indices, direction
+            )
         obstructions = multiplex_obs + point_obs + forced_obs
         requirements = multiplex_reqs + point_reqs
         return Tiling(obstructions, requirements, self.new_dimensions())

@@ -56,7 +56,7 @@ class MTRequirementPlacementStrategy(
         so add it as a requirement in every possible way."""
         return (comb_class.add_obstructions(self.gcps),) + self.algorithm(
             comb_class
-        ).req_placement(self.gcps, self.indices, self.direction)
+        ).point_placement(self.gcps, self.indices, self.direction)
 
     def extra_parameters(
         self,
