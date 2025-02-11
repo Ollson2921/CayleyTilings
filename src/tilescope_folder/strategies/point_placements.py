@@ -48,7 +48,6 @@ class RequirementPlacementStrategy(DisjointUnionStrategy[Tiling, GriddedCayleyPe
         return PointPlacement(tiling)
 
     def decomposition_function(self, comb_class: Tiling) -> Tuple[Tiling, ...]:
-        # print(self.gcps)
         return (comb_class.add_obstructions(self.gcps),) + self.algorithm(
             comb_class
         ).point_placement(self.gcps, self.indices, self.direction)

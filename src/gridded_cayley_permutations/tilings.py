@@ -79,6 +79,13 @@ class Tiling(CombinatorialClass):
                 return False
         return True
 
+    def gcp_in_tiling(self, gcp: GriddedCayleyPerm) -> bool:
+        return (
+            self.satisfies_obstructions(gcp)
+            and self.satisfies_requirements(gcp)
+            and all(cell < self.dimensions for cell in gcp.positions)
+        )
+
     def active_cells(self):
         """Returns the set of active cells in the tiling.
         (Cells are active if they do not contain a point obstruction.)"""
@@ -310,6 +317,32 @@ class Tiling(CombinatorialClass):
                     return False
                 ob_list.remove(shift)
         return True
+    
+    ## Construction methods
+    @staticmethod
+    def from_vincular(cperm :CayleyPermutation, adjacencies :Iterable[int]):
+        '''Both cperm and adjacencies must be 0 based. Creates a tiling from a vincular pattern. Adjacencies is a list of positions where i in adjacencencies means positions i and i+1 must be adjacent'''
+        dimensions = (len(cperm), max(cperm)+1)
+        all_obs, all_reqs = [], []
+        perm_cells = [(2*k+1,2*cperm[k]+1) for k in range(dimensions[0])]
+        cols, rows = [2*i+1 for i in range(dimensions[0])] + [2*i+2 for i in adjacencies], [2*i+1 for i in range(dimensions[1])]
+        col_cells = [cell for cell in product(cols,range(2*dimensions[1]+1)) if cell not in perm_cells] #this is all the cells that will have point obstructions
+        for cell in col_cells:
+                all_obs.append(GriddedCayleyPerm(CayleyPermutation([0]), [cell]))
+        for i in rows:  #this puts the 01,10 obstructions across each row
+            for j in range(2*dimensions[0]+1):
+                cell1 = (j,i)
+                if cell1 not in col_cells:
+                    for k in range(j,2*dimensions[0]+1):
+                        cell2 = (k,i)
+                        if cell2 not in col_cells:
+                            all_obs.append(GriddedCayleyPerm(CayleyPermutation([0,1]), [cell1,cell2]))
+                            all_obs.append(GriddedCayleyPerm(CayleyPermutation([1,0]), [cell1,cell2]))
+        for cell in perm_cells: #this puts the point requirement and the 00 obstruction according to the permutation
+            all_reqs.append([GriddedCayleyPerm(CayleyPermutation([0]), [cell])])
+            all_obs.append(GriddedCayleyPerm(CayleyPermutation([0,0]), [cell,cell]))
+        return Tiling(all_obs,all_reqs,(2*dimensions[0]+1, 2*dimensions[1]+1))
+
 
     ### CSS methods
 
