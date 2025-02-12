@@ -73,20 +73,20 @@ class Parameter:
             del new_row_map[index]
         return RowColMap(new_col_map, new_row_map).standardise_map()
     
-    def back_map_obs_and_reqs(self, tiling : Tiling):
+    def back_map_obs_and_reqs(self, tiling = Tiling):
         '''Places all obs and reqs of tiling into the parameter according to the row/col map. 
         Returns a new parameter, but maybe we should just add obs and reqs to existing parameters, IDK
         Doing this for req lists is weird...
         '''
-        new_obs, new_reqs = list(self.ghost.obstructions), list(self.ghost.requirements)
-        for obstruction in tiling.obstructions:
-            new_obs+= list(self.map.preimage_of_gridded_cperm(obstruction))
+        new_obs, new_reqs = self.ghost.obstructions.copy(), self.ghost.requirements.copy()
+        for obstructions in tiling.obstructions:
+            new_obs.append(self.map.preimage_of_gridded_cperm(obstruction))
         for reqs in tiling.requirements:
-            new_req_list=[]
+            new_req_list = []
             for req in reqs:
                 new_req_list+= list(self.map.preimage_of_gridded_cperm(req))
             new_reqs.append(new_req_list)
-        return Parameter(Tiling(new_obs,new_reqs,self.ghost.dimensions), self.map)
+        return Parameter(Tiling(new_obs, new_reqs, self.ghost.dimensions), self.map)
 
     def sub_parameter(self, factor):
         preimage_of_cells = self.map.preimage_of_cells(factor)
@@ -183,6 +183,7 @@ class MappedTiling(CombinatorialClass):
                 return False
         return True
                 
+        return self.tiling == Tiling(obstructions, requirements, self.tiling.dimensions)
 
     def is_contradictory(
         self, confidence=8
@@ -294,8 +295,7 @@ class MappedTiling(CombinatorialClass):
             new_containing_parameters,
             new_enumeration_parameters,
         )
-        
-    
+
     def remove_empty_rows_and_cols_from_param_list(
         self, parameters, empty_cols, empty_rows
     ):  # Good

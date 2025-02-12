@@ -28,7 +28,7 @@ Cell = Tuple[int, int]
 class MTRequirementPlacementStrategy(
     DisjointUnionStrategy[MappedTiling, GriddedCayleyPerm]
 ):
-    """Places the requirements in gcps at the indices in the direction given in the mappling."""
+    """Places the parameter at the indices in the direction and cell given in the mappling."""
 
     DIRECTIONS = Directions
 
@@ -58,7 +58,7 @@ class MTRequirementPlacementStrategy(
         """Either the cells doesn't contain gcp so add it as obstruction
         or it contains an occurrence of it furthest in the direction given
         so add it as a requirement in every possible way.
-        TOD: add option for no occurrence of parameter?"""
+        TODO: add option for no occurrence of parameter?"""
         return self.algorithm().param_placement(self.index_of_pattern, self.direction)
 
     def extra_parameters(
@@ -69,7 +69,7 @@ class MTRequirementPlacementStrategy(
         return tuple({} for _ in self.decomposition_function(comb_class))
 
     def formal_step(self):
-        return f"Placed the point of the requirement {self.gcps} at indices {self.indices} in direction {self.direction}"
+        return f"Placed the point of the parameter {self.parameter} at indices {self.index_of_pattern} in direction {self.direction} in cell {self.cell}"
 
     def backward_map(
         self,

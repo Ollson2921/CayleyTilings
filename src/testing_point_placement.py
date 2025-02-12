@@ -100,6 +100,10 @@ gcps = (
 )
 indices = (0,)
 direction = 1
-for mt in MTRequirementPlacement(M).req_placement(gcps, indices, direction):
+for mt in MTRequirementPlacement(M).point_placement(gcps, indices, 0):
     print(mt)
     print("-" * 20)
+# print(
+#     MTRequirementPlacement(M).point_placement_in_cell(gcps, indices, 6, (0, 0))
+#     == MTRequirementPlacement(M).directionless_point_placement((0, 0))
+# )
