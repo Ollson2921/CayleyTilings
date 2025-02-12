@@ -78,9 +78,9 @@ class Parameter:
         Returns a new parameter, but maybe we should just add obs and reqs to existing parameters, IDK
         Doing this for req lists is weird...
         '''
-        new_obs, new_reqs = self.ghost.obstructions.copy(), self.ghost.requirements.copy()
-        for obstructions in tiling.obstructions:
-            new_obs.append(self.map.preimage_of_gridded_cperm(obstruction))
+        new_obs, new_reqs = list(self.ghost.obstructions), list(self.ghost.requirements)
+        for obstruction in tiling.obstructions:
+            new_obs+= list(self.map.preimage_of_gridded_cperm(obstruction))
         for reqs in tiling.requirements:
             new_req_list = []
             for req in reqs:
