@@ -12,7 +12,6 @@ class MTFactor:
         all_factors = Factors(self.mappling.tiling).find_factors_tracked()
         for parameter in parameters:
             t_factors = all_factors
-            print(all_factors)
             p_factors = Factors(parameter.ghost).find_factors_tracked()
             all_factors = []
             queue = t_factors
@@ -40,7 +39,6 @@ class MTFactor:
                         break
                     for T in new_t_factors:
                         final_t_factor += T
-                print(final_t_factor)
                 all_factors.append(final_t_factor)
         return all_factors
 
