@@ -25,11 +25,11 @@ mappling = MappedTiling(base_tiling, [], [[param]], [])
 
 cell = (0, 0)
 output = ParameterPlacement(mappling, param, cell).param_placement(3, 0)
-# print(output)
+print(output)
 
-for n in range(1, 8):
-    param_placed_count = output.get_objects(n)
-    map_count = mappling.get_objects(n)
-    print(map_count)
-    print(param_placed_count)
-    print("Are they equal?", map_count == param_placed_count)
+# for n in range(1, 8):
+#     param_placed_count = output.get_objects(n)
+#     map_count = mappling.get_objects(n)
+#     print(map_count)
+#     print(param_placed_count)
+#     print("Are they equal?", map_count == param_placed_count)
