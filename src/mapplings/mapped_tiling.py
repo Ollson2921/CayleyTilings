@@ -15,7 +15,7 @@ Objects = DefaultDict[Tuple[int, ...], List[GriddedCayleyPerm]]
 
 
 class Parameter:
-    def __init__(self, tiling, row_col_map):
+    def __init__(self, tiling : Tiling, row_col_map : RowColMap ):
         """we may need to keep track of which direction the row_col_map goes"""
         self.ghost = tiling
         self.map = row_col_map
@@ -73,18 +73,18 @@ class Parameter:
             del new_row_map[index]
         return RowColMap(new_col_map, new_row_map).standardise_map()
     
-    def back_map_obs_and_reqs(self, tiling = Tiling):
+    def back_map_obs_and_reqs(self, tiling : Tiling):
         '''Places all obs and reqs of tiling into the parameter according to the row/col map. 
         Returns a new parameter, but maybe we should just add obs and reqs to existing parameters, IDK
         Doing this for req lists is weird...
         '''
-        new_obs, new_reqs = self.ghost.obstructions.copy(), self.ghost.requirements.copy()
-        for obstructions in tiling.obstructions:
-            new_obs.append(self.map.preimage_of_gridded_cperm(obstruction))
+        new_obs, new_reqs = list(self.ghost.obstructions), list(self.ghost.requirements)
+        for obstruction in tiling.obstructions:
+            new_obs+= list(self.map.preimage_of_gridded_cperm(obstruction))
         for reqs in tiling.requirements:
             new_req_list=[]
             for req in reqs:
-                new_req_list.append(param.map.preimage_of_gridded_cperm(req))
+                new_req_list+= list(self.map.preimage_of_gridded_cperm(req))
             new_reqs.append(new_req_list)
         return Parameter(Tiling(new_obs,new_reqs,self.ghost.dimensions), self.map)
 
@@ -178,13 +178,11 @@ class MappedTiling(CombinatorialClass):
         )
 
     def avoiders_are_trivial(self):
-        obstructions, requirements = [], []
         for param in self.avoiding_parameters:
             if param.ghost != self.tiling:
                 return False
         return True
                 
-        return self.tiling == Tiling(obstructions, requirements, self.tiling.dimensions)
 
     def is_contradictory(
         self, confidence=8
