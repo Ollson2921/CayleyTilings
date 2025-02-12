@@ -79,3 +79,99 @@ for factor in MTFactor(M).find_factors():
 # print(M.find_factors())
 
 print(MTFactor(M).is_factorable2(MTFactor(M).find_factor_cells()))
+
+
+point = CayleyPermutation((0,))
+asc2 = CayleyPermutation((0,1))
+asc3 = CayleyPermutation((0,1,2))
+obstructions = [
+    GriddedCayleyPerm(point,((0,0),)),
+    GriddedCayleyPerm(point,((0,1),)),
+    GriddedCayleyPerm(point,((0,2),)),
+    GriddedCayleyPerm(point,((0,3),)),
+    GriddedCayleyPerm(point,((1,0),)),
+    GriddedCayleyPerm(point,((2,0),)),
+    GriddedCayleyPerm(point,((3,0),)),
+    GriddedCayleyPerm(point,((1,2),)),
+    GriddedCayleyPerm(point,((1,3),)),
+    GriddedCayleyPerm(point,((2,1),)),
+    GriddedCayleyPerm(point,((3,1),)),
+    GriddedCayleyPerm(point,((2,2),)),
+    GriddedCayleyPerm(point,((2,3),)),
+    GriddedCayleyPerm(point,((3,2),)),
+    GriddedCayleyPerm(point,((4,4),)),
+    GriddedCayleyPerm(asc2,((2,4),(2,4))),
+    GriddedCayleyPerm(asc2,((4,2),(4,2))),
+    GriddedCayleyPerm(asc3,((0,4),(0,4),(0,4))),
+    GriddedCayleyPerm(asc3,((0,4),(0,4),(2,4))),
+    GriddedCayleyPerm(asc3,((4,0),(4,0),(4,0))),
+    GriddedCayleyPerm(asc3,((4,0),(4,0),(4,2)))
+    ]
+
+requirements = [[GriddedCayleyPerm(point,((1,1)))],[GriddedCayleyPerm(point,((3,3)))]]
+
+T1 = Tiling(obstructions,requirements,(5,5))
+
+obstructions = [
+    GriddedCayleyPerm(point,((0,0),)),
+    GriddedCayleyPerm(point,((0,1),)),
+    GriddedCayleyPerm(point,((0,2),)),
+    GriddedCayleyPerm(point,((0,3),)),
+    GriddedCayleyPerm(point,((0,4),)),
+    GriddedCayleyPerm(point,((0,5),)),
+
+    GriddedCayleyPerm(point,((1,0),)),
+    GriddedCayleyPerm(point,((2,0),)),
+    GriddedCayleyPerm(point,((3,0),)),
+    GriddedCayleyPerm(point,((4,0),)),
+    GriddedCayleyPerm(point,((5,0),)),  
+
+    GriddedCayleyPerm(point,((1,2),)),
+    GriddedCayleyPerm(point,((1,3),)),
+    GriddedCayleyPerm(point,((1,4),)),
+    GriddedCayleyPerm(point,((1,5),)),
+
+    GriddedCayleyPerm(point,((2,1),)),
+    GriddedCayleyPerm(point,((3,1),)),
+    GriddedCayleyPerm(point,((4,1),)),
+    GriddedCayleyPerm(point,((5,1),)),
+
+    GriddedCayleyPerm(point,((2,2),)),
+    GriddedCayleyPerm(point,((2,3),)),
+    GriddedCayleyPerm(point,((2,4),)),
+    GriddedCayleyPerm(point,((2,5),)),
+
+    GriddedCayleyPerm(point,((3,2),)),
+    GriddedCayleyPerm(point,((4,2),)),
+    GriddedCayleyPerm(point,((5,2),)),
+
+    GriddedCayleyPerm(point,((3,3),)),
+    GriddedCayleyPerm(point,((3,4),)),
+
+    GriddedCayleyPerm(point,((4,3),)),
+
+
+
+    GriddedCayleyPerm(point,((4,4),)),
+
+    GriddedCayleyPerm(point,((6,4),)),
+    GriddedCayleyPerm(point,((6,5),)),
+    GriddedCayleyPerm(point,((6,6),)),
+    GriddedCayleyPerm(point,((5,6),)),
+    GriddedCayleyPerm(point,((4,6),)),
+
+    GriddedCayleyPerm(asc2,((2,6),(2,6))),
+    GriddedCayleyPerm(asc2,((6,2),(6,2))),
+    GriddedCayleyPerm(asc2,((4,4),(4,4))),
+
+    GriddedCayleyPerm(asc3,((0,6),(0,6),(0,6))),
+    GriddedCayleyPerm(asc3,((0,6),(0,6),(2,6))),
+    GriddedCayleyPerm(asc3,((6,0),(6,0),(6,0))),
+    GriddedCayleyPerm(asc3,((6,0),(6,0),(6,2)))
+    ]
+
+requirements = [[GriddedCayleyPerm(point,((1,1)))],[GriddedCayleyPerm(point,((5,3)))],[GriddedCayleyPerm(point,((3,5)))]]
+
+P = Tiling(obstructions,requirements,(7,7))
+
+P1 = Parameter(P,{})
