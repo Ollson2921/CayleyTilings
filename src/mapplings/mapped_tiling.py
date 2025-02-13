@@ -15,10 +15,33 @@ Objects = DefaultDict[Tuple[int, ...], List[GriddedCayleyPerm]]
 
 
 class Parameter:
-    def __init__(self, tiling : Tiling, row_col_map : RowColMap ):
+    def __init__(self, ghost: Tiling, row_col_map: RowColMap):
         """we may need to keep track of which direction the row_col_map goes"""
-        self.ghost = tiling
-        self.map = row_col_map
+        cols_to_remove, rows_to_remove = self.empty_rows_and_columns_to_delete(
+            ghost, row_col_map
+        )
+        self.map = self.reduce_row_col_map(cols_to_remove, rows_to_remove)
+        self.ghost = ghost.delete_rows_and_columns(cols_to_remove, rows_to_remove)
+
+    def empty_rows_and_columns_to_delete(self, ghost: Tiling, row_col_map: RowColMap):
+        """Delete empty rows and columns in parameters if not
+        only row/col mapping to a row/col in the base tiling.
+        Only delete rows/cols if they map to something that another
+        row/col in the parameter maps to."""
+        empty_cols, empty_rows = ghost.find_empty_rows_and_columns()
+        col_values = [row_col_map.col_map[col] for col in range(ghost.dimensions[0])]
+        cols_to_remove = []
+        for col in empty_cols:
+            if col_values.count(row_col_map.col_map[col]) > 1:
+                col_values.remove(row_col_map.col_map[col])
+                cols_to_remove.append(col)
+        row_values = [row_col_map.row_map[row] for row in range(ghost.dimensions[1])]
+        rows_to_remove = []
+        for row in empty_rows:
+            if row_values.count(row_col_map.row_map[row]) > 1:
+                row_values.remove(row_col_map.row_map[row])
+                rows_to_remove.append(row)
+        return cols_to_remove, rows_to_remove
 
     def is_contradictory(self, tiling: Tiling) -> bool:
         """Returns True if the parameter is contradictory.
@@ -72,19 +95,19 @@ class Parameter:
         for index in row_preimages:
             del new_row_map[index]
         return RowColMap(new_col_map, new_row_map).standardise_map()
-    
-    def back_map_obs_and_reqs(self, tiling = Tiling):
-        '''Places all obs and reqs of tiling into the parameter according to the row/col map. 
+
+    def back_map_obs_and_reqs(self, tiling=Tiling):
+        """Places all obs and reqs of tiling into the parameter according to the row/col map.
         Returns a new parameter, but maybe we should just add obs and reqs to existing parameters, IDK
         Doing this for req lists is weird...
-        '''
+        """
         new_obs, new_reqs = list(self.ghost.obstructions), list(self.ghost.requirements)
         for obstruction in tiling.obstructions:
-            new_obs+= list(self.map.preimage_of_gridded_cperm(obstruction))
+            new_obs += list(self.map.preimage_of_gridded_cperm(obstruction))
         for reqs in tiling.requirements:
             new_req_list = []
             for req in reqs:
-                new_req_list+= list(self.map.preimage_of_gridded_cperm(req))
+                new_req_list += list(self.map.preimage_of_gridded_cperm(req))
             new_reqs.append(new_req_list)
         return Parameter(Tiling(new_obs, new_reqs, self.ghost.dimensions), self.map)
 
@@ -109,9 +132,53 @@ class MappedTiling(CombinatorialClass):
         enumeration_parameters: Iterable[Iterable[Parameter]],
     ):
         self.tiling = tiling
-        self.avoiding_parameters = avoiding_parameters
-        self.containing_parameters = containing_parameters
-        self.enumeration_parameters = enumeration_parameters
+        self.containing_parameters = self.tidy_containing_parameters(
+            containing_parameters
+        )
+        if self.containing_parameters == False:
+            self.tiling = Tiling([], [], self.tiling.dimensions)
+            self.containing_parameters = []
+            self.avoiding_parameters = []
+            self.enumeration_parameters = []
+        else:
+            self.avoiding_parameters = self.remove_empty_ghosts_from_list(
+                avoiding_parameters
+            )
+            self.enumeration_parameters = enumeration_parameters
+
+    def remove_empty_ghosts_from_list(
+        self, avoiding_parameters: List[Parameter]
+    ) -> List[Parameter]:
+        """Remove any parameters with empty tilings."""
+        return [param for param in avoiding_parameters if not param.ghost.is_empty()]
+
+    def tidy_containing_parameters(
+        self, containing_parameters: List[List[Parameter]]
+    ) -> List[List[Parameter]]:
+        """For parameters with empty tilings, if it is the only
+         one in a list then the mappling is empty, otherwise remove the empty
+         parameter.
+        If only one parameter in a list and it maps to base tiling by the identity map
+        then map obs and reqs down and remove the parameter list.
+        Note: As we always assume a parameter maps to the whole tiling, we defined a row
+         col map as being trivial iff the dimenstions of the tiling and ghost are the same.
+        """
+        new_containing_parameters = []
+        for param_list in containing_parameters:
+            if len(param_list) == 1:
+                if param_list[0].ghost.is_empty():
+                    return False
+                if param_list[0].ghost.dimensions == self.tiling.dimensions:
+                    self.tiling = param_list[0].back_map_obs_and_reqs(self.tiling).ghost
+                else:
+                    new_containing_parameters.append(param_list)
+            else:
+                new_containing_parameters.append(
+                    self.remove_empty_ghosts_from_list(param_list)
+                )
+        return new_containing_parameters
+
+    ## Combintatorial class stuff ##
 
     def objects_of_size(self, n, **parameters):  # Good
         for val in self.get_objects(n).values():
@@ -182,7 +249,7 @@ class MappedTiling(CombinatorialClass):
             if param.ghost != self.tiling:
                 return False
         return True
-                
+
         return self.tiling == Tiling(obstructions, requirements, self.tiling.dimensions)
 
     def is_contradictory(
