@@ -10,9 +10,11 @@ class MTFactor:
         """Returns a partition of the cells so that the mapped tiling is factored."""
         parameters = self.mappling.all_parameters()
         all_factors = Factors(self.mappling.tiling).find_factors_tracked()
+        print(all_factors)
         for parameter in parameters:
             t_factors = all_factors
             p_factors = Factors(parameter.ghost).find_factors_tracked()
+            print(p_factors)
             all_factors = []
             queue = t_factors
             while queue:
@@ -37,6 +39,7 @@ class MTFactor:
                         queue = [t for t in queue if t not in temp]
                     if not new_t_factors:
                         break
+                    print(new_t_factors)
                     for T in new_t_factors:
                         final_t_factor += T
                 all_factors.append(final_t_factor)

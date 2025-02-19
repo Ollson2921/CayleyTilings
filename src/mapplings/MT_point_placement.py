@@ -162,15 +162,18 @@ class MTRequirementPlacement:
         """Doing directionless point placements in parameter list and updating maps."""
         new_param_list = []
         for parameter in param_list:
-            new_ghost = PointPlacement(parameter.ghost).directionless_point_placement(
-                cell
-            )
-            if new_ghost.is_empty():
-                continue
-            new_param = self.new_parameter_from_point_placed_tiling(
-                parameter, new_ghost, cell
-            )
-            new_param_list.append(new_param)
+            new_cells = parameter.map.preimage_of_cell(cell)
+            #print(parameter)
+            for new_cell in new_cells:
+                new_ghost = PointPlacement(parameter.ghost).directionless_point_placement(
+                new_cell
+                )
+                if new_ghost.is_empty():
+                    continue
+                new_param = self.new_parameter_from_point_placed_tiling(
+                    parameter, new_ghost, new_cell
+                )
+                new_param_list.append(new_param)
         return new_param_list
 
     def new_parameter_from_point_placed_tiling(

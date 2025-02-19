@@ -124,8 +124,16 @@ obstructions = [
 requirements = [[GriddedCayleyPerm(point,((1,1),))],[GriddedCayleyPerm(point,((3,3),))]]
 
 T1 = Tiling(obstructions,requirements,(5,5))
-#print(T1)
+temp = Tiling([GriddedCayleyPerm(cay,((0,0),(0,0)))],[],(1,1))
+
+
+
 P0 = Parameter(T1,RowColMap({0:0,1:0,2:0,3:0,4:0},{0:0,1:0,2:0,3:0,4:0}))
+P0 = P0.back_map_obs_and_reqs(temp)
+
+T1 = P0.ghost
+
+#print(T1)
 
 new_obstructions = [
     GriddedCayleyPerm(point,((4,0),)),
@@ -151,31 +159,30 @@ P2 = Parameter(P2.back_map_obs_and_reqs(T1).ghost,RowColMap({0:0,1:1,2:2,3:3,4:4
 P2 = P2.back_map_obs_and_reqs(T1)
 #print(P2.ghost)
 
-T0 = Tiling([GriddedCayleyPerm(asc3,((0,0),(0,0),(0,0)))],[[GriddedCayleyPerm(point,((0,0),))]],(1,1))
+T0 = Tiling([GriddedCayleyPerm(asc3,((0,0),(0,0),(0,0))),GriddedCayleyPerm(cay,((0,0),(0,0)))],[[GriddedCayleyPerm(point,((0,0),))]],(1,1))
 
-M0 = MappedTiling(T0,[],[[P0]],[])
+M0 = MappedTiling(T0,[],[[P0],],[])
 
-M1 = MappedTiling(T1,[P1,P2],[],[])
+#M1 = MappedTiling(T1,[P1,P2],[],[])
 
+M2 = ParameterPlacement(M0,P0,(0,0)).param_placement(4,0)
 
-#print(M1)
-print(MTFactor(M1).is_factorable(MTFactor(M1).find_factor_cells()))
+M3 = ParameterPlacement(M2,M2.containing_parameters[0][0],(2,2)).param_placement(4,1)
 
-#for factor in MTFactor(M1).find_factors():
-#    print("-------------------------------------")
-#    print(factor)
+NCP = M3.tidy_containing_parameters(M3.containing_parameters)
 
+M4 = MappedTiling(M3.tiling, M3.avoiding_parameters, NCP, M3.enumeration_parameters)
 
+M5 = M4.reap_all_contradictions()
 
+print(M5)
 
+for factor in MTFactor(M5).find_factor_cells():
+    print("-------------------------------------")
+    print(factor)
 
+# for factor in MTFactor(list(MTFactor(M5).find_factors())[2]).find_factors():
+#     print("-------------------------------------")
+#     print(factor)
 
-
-
-
-#T = Tiling([GriddedCayleyPerm(CayleyPermutation([0,1,2]),((0,0),(0,0),(0,0)))],[[GriddedCayleyPerm(point,((0,0),))]])
-
-#M5 = MappedTiling(T,[],[[P1]],[])
-
-#ParameterPlacement(M5,P1,(0,0))
-
+#print(M0)

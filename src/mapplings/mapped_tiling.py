@@ -17,11 +17,18 @@ Objects = DefaultDict[Tuple[int, ...], List[GriddedCayleyPerm]]
 class Parameter:
     def __init__(self, ghost: Tiling, row_col_map: RowColMap):
         """we may need to keep track of which direction the row_col_map goes"""
+        self.map = row_col_map
+        self.ghost = ghost
+
+    def cleanup(self):
         cols_to_remove, rows_to_remove = self.empty_rows_and_columns_to_delete(
-            ghost, row_col_map
+            self.ghost, self.map
         )
-        self.map = self.reduce_row_col_map(cols_to_remove, rows_to_remove)
-        self.ghost = ghost.delete_rows_and_columns(cols_to_remove, rows_to_remove)
+        new_map = self.reduce_row_col_map(cols_to_remove, rows_to_remove)
+        new_ghost = self.ghost.delete_rows_and_columns(cols_to_remove, rows_to_remove)
+        return Parameter(new_ghost,new_map)
+
+
 
     def empty_rows_and_columns_to_delete(self, ghost: Tiling, row_col_map: RowColMap):
         """Delete empty rows and columns in parameters if not
@@ -43,7 +50,7 @@ class Parameter:
                 rows_to_remove.append(row)
         return cols_to_remove, rows_to_remove
 
-    def is_contradictory(self, tiling: Tiling) -> bool:
+    def is_contradictory(self, tiling: Tiling) -> bool: #good
         """Returns True if the parameter is contradictory.
         Is contradictory if any of the requirements in the ghost map to a gcp
         containing an obstruction in the tiling
@@ -131,20 +138,24 @@ class MappedTiling(CombinatorialClass):
         containing_parameters: Iterable[Iterable[Parameter]],
         enumeration_parameters: Iterable[Iterable[Parameter]],
     ):
+        # self.tiling = tiling
+        # self.containing_parameters = self.tidy_containing_parameters(
+        #     containing_parameters
+        # )
+        # if self.containing_parameters == False:
+        #     self.tiling = Tiling([], [], self.tiling.dimensions)
+        #     self.containing_parameters = []
+        #     self.avoiding_parameters = []
+        #     self.enumeration_parameters = []
+        # else:
+        #     self.avoiding_parameters = self.remove_empty_ghosts_from_list(
+        #         avoiding_parameters
+        #     )
+        #     self.enumeration_parameters = enumeration_parameters
+        self.avoiding_parameters = avoiding_parameters
+        self.containing_parameters = containing_parameters
+        self.enumeration_parameters = enumeration_parameters
         self.tiling = tiling
-        self.containing_parameters = self.tidy_containing_parameters(
-            containing_parameters
-        )
-        if self.containing_parameters == False:
-            self.tiling = Tiling([], [], self.tiling.dimensions)
-            self.containing_parameters = []
-            self.avoiding_parameters = []
-            self.enumeration_parameters = []
-        else:
-            self.avoiding_parameters = self.remove_empty_ghosts_from_list(
-                avoiding_parameters
-            )
-            self.enumeration_parameters = enumeration_parameters
 
     def remove_empty_ghosts_from_list(
         self, avoiding_parameters: List[Parameter]
@@ -222,12 +233,19 @@ class MappedTiling(CombinatorialClass):
             for params in self.containing_parameters
         )
 
-    def reap_contradictory_ghosts(self):  # BAD
-        """Removes parameters which are contradictory"""
-        for n in range(len(self.parameters)):
-            ghost = self.parameters[n]
-            if ghost.is_contradictory(self.tiling):
-                self.kill_ghost(n)
+    def reap_contradictory_ghosts_from_list(self,parameter_list):  # Good?
+        """Removes parameters which are contradictory from parameter list"""
+        return [A for A in parameter_list if not A.is_contradictory(self.tiling)]
+    
+    def reap_all_contradictions(self): #good
+        '''Removes any contradictory ghosts from each ACE list.
+        Also removes empty C or E lists'''
+        new_avoiders = self.reap_contradictory_ghosts_from_list(self.avoiding_parameters)
+        new_containers = [self.reap_contradictory_ghosts_from_list(c_list) for c_list in self.containing_parameters]
+        new_containers = [c_list for c_list in new_containers if c_list]
+        new_enumerators =  [self.reap_contradictory_ghosts_from_list(e_list) for e_list in self.enumeration_parameters]
+        new_enumerators = [e_list for e_list in new_enumerators if e_list]
+        return MappedTiling(self.tiling, new_avoiders,new_containers,new_enumerators)
 
     def kill_ghost(self, ghost_number: int):  # BAD
         """removes a ghost from the mapped tiling"""

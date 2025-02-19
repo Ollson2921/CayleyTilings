@@ -21,16 +21,21 @@ class ParameterPlacement:
     def param_placement(self, direction: int, index_of_pattern: int) -> MappedTiling:
         """Place a parameter in the tiling."""
         """index_of_pattern is the index of the pattern that is placed in the tiling and is 0 based."""
-        if [self.param] in self.mappling.containing_parameters:
-            self.mappling.containing_parameters.remove([self.param])
+        temp_containing_parameters = self.mappling.containing_parameters.copy()
+        if [self.param] in temp_containing_parameters:
+            temp_containing_parameters.remove([self.param])
         new_mappling = MTRequirementPlacement(
-            self.mappling
-        ).directionless_point_placement(self.cell)
-
+            MappedTiling(self.mappling.tiling, 
+                         self.mappling.avoiding_parameters, 
+                         temp_containing_parameters, 
+                         self.mappling.enumeration_parameters)
+            ).directionless_point_placement(self.cell)
+        #print(new_mappling)
         new_avoiding_parameters = (
             new_mappling.avoiding_parameters
             + self.find_new_avoiding_parameters(direction, index_of_pattern)
         )
+        
         new_containing_parameters = self.update_containing_parameters(
             index_of_pattern, new_mappling.containing_parameters
         )
