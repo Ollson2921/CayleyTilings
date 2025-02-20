@@ -25,17 +25,19 @@ class ParameterPlacement:
         if [self.param] in temp_containing_parameters:
             temp_containing_parameters.remove([self.param])
         new_mappling = MTRequirementPlacement(
-            MappedTiling(self.mappling.tiling, 
-                         self.mappling.avoiding_parameters, 
-                         temp_containing_parameters, 
-                         self.mappling.enumeration_parameters)
-            ).directionless_point_placement(self.cell)
-        #print(new_mappling)
+            MappedTiling(
+                self.mappling.tiling,
+                self.mappling.avoiding_parameters,
+                temp_containing_parameters,
+                self.mappling.enumeration_parameters,
+            )
+        ).directionless_point_placement(self.cell)
+        # print(new_mappling)
         new_avoiding_parameters = (
             new_mappling.avoiding_parameters
             + self.find_new_avoiding_parameters(direction, index_of_pattern)
         )
-        
+
         new_containing_parameters = self.update_containing_parameters(
             index_of_pattern, new_mappling.containing_parameters
         )

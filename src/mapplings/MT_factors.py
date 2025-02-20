@@ -2,19 +2,18 @@ from .mapped_tiling import MappedTiling, Parameter
 from tilescope_folder.strategies.factor import Factors
 from gridded_cayley_permutations import Tiling
 
+
 class MTFactor:
-    def __init__(self,MappedTiling):
+    def __init__(self, MappedTiling):
         self.mappling = MappedTiling
 
     def find_factor_cells(self):
         """Returns a partition of the cells so that the mapped tiling is factored."""
         parameters = self.mappling.all_parameters()
         all_factors = Factors(self.mappling.tiling).find_factors_tracked()
-        print(all_factors)
         for parameter in parameters:
             t_factors = all_factors
             p_factors = Factors(parameter.ghost).find_factors_tracked()
-            print(p_factors)
             all_factors = []
             queue = t_factors
             while queue:
@@ -39,14 +38,14 @@ class MTFactor:
                         queue = [t for t in queue if t not in temp]
                     if not new_t_factors:
                         break
-                    print(new_t_factors)
+                    # print(new_t_factors)
                     for T in new_t_factors:
                         final_t_factor += T
                 all_factors.append(final_t_factor)
         return all_factors
 
     # def is_factorable(self, confidence = 8) -> bool:
-    #     """Returns True if no more than 1 factor is nontrivial in regards. 
+    #     """Returns True if no more than 1 factor is nontrivial in regards.
     #     TODO: This is a temporary method and not optimal"""
     #     factor_cells = self.mappling.find_factor_cells()
     #     factors = MappedTiling(self.mappling.tiling, self.mappling.avoiding_parameters,[],[]).make_factors(factor_cells)
@@ -56,17 +55,21 @@ class MTFactor:
     #         if non_trivial_factors > 1:
     #             return False
     #     return True
-    
+
     def is_factorable(self, factor_cells):
-        factors = MTFactor(MappedTiling(self.mappling.tiling, self.mappling.avoiding_parameters,[],[])).make_factors(factor_cells)
+        factors = MTFactor(
+            MappedTiling(
+                self.mappling.tiling, self.mappling.avoiding_parameters, [], []
+            )
+        ).make_factors(factor_cells)
         non_trivial_factors = 0
         for factor in factors:
             non_trivial_factors += int(not factor.avoiders_are_trivial())
             if non_trivial_factors > 1:
                 return False
         return True
-    
-    def make_factors(self,factor_cells):
+
+    def make_factors(self, factor_cells):
         for factor in factor_cells:
             factor_tiling = self.mappling.tiling.sub_tiling(factor)
             factor_avoiding_parameters = []
@@ -86,7 +89,7 @@ class MTFactor:
                 factor_containing_parameters,
                 factor_enumeration_parameters,
             ).remove_empty_rows_and_columns()
-        
+
     def find_factors(self):
         return self.make_factors(self.find_factor_cells())
 
